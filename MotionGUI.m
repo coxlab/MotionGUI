@@ -18,7 +18,7 @@ clc
 %% create main fig
 hFig=figure(3);
 set(hFig,'Name','Create motion trajectories','NumberTitle','Off','MenuBar','None','Position',[824    50   444   436],'Resize','On');
-WinOnTop(hFig,true);
+%WinOnTop(hFig,true);
 
 %%% Add subfolders
 path_dir=fileparts(mfilename('fullpath'));
@@ -46,7 +46,7 @@ window_reset=struct('calibrated',0,'coords',zeros(5,3),'Z_offset',0,'coords_coll
 Calibration=struct('coordinate_system',coordinate_system,'headplate',headplate,'window',window_reset,'window_reset',window_reset);
 Trajectory=struct('coords_matrix',[],'nCoords',0,'target_coord',0,'target_index',0,'velocity',0,'running',0);
 
-handles=struct('hFig',hFig,'hPanel_axis',hPanel_axis,'comport',comport,'coords',[0 0 0],'mode',0,'velocity',[],'nSteps',0,'dwell_time',1,'s',[],'current_config',0);
+handles=struct('hFig',hFig,'hPanel_axis',hPanel_axis,'comport',comport,'coords',[0 0 0],'mode',0,'velocity',[],'nSteps',0,'dwell_time',1,'s',[],'current_config',0,'ccd2p',0);
 handles.Calibration=Calibration;
 handles.Trajectory=Trajectory;
 handles.coords=[0 0 0];
@@ -100,7 +100,7 @@ hBut15=uicontrol(hPanel_buttons,'Style','Pushbutton','String','Joystick','Units'
 hBut16=uicontrol(hPanel_buttons,'Style','Pushbutton','String','Vel','Units','Normalized','Position',[button_init+5*button_spacing_left button_init-1*button_spacing_up button_width/2 button_height],'Callback',@changeVelocities);
 
 %% add button to axis panel
-uicontrol(hPanel_axis,'Style','togglebutton','String','CCD/2p','Units','Normalized','Position',[0 .95 .15 .05 ],'Callback',@toggleCCD2p);
+%uicontrol(hPanel_axis,'Style','togglebutton','String','CCD/2p','Units','Normalized','Position',[0 .95 .15 .05 ],'Callback',@toggleCCD2p);
 
 guidata(hFig,handles)
 
