@@ -1,22 +1,12 @@
-function varargout=grabCoordinate(varargin)
+function grabCoordinate(varargin)
 global state
 H=varargin{1};
 handles=guidata(H);
 
-new_coord=getMotorPosition(handles.s);
-handles.Trajectory.coords_matrix(handles.Trajectory.nCoords+1,:)=new_coord;
-handles.Trajectory.nCoords=handles.Trajectory.nCoords+1;
+interface=handles.interface;
+new_coord=interface.cur_coords;
 
-%%% Update GUI
-%set(handles.hEdit02,'String',sprintf('X=%03.3f; Y=%03.3f; Z=%03.3f',new_coord))
-set(handles.hEdit03,'String',sprintf('nCoords=%d',handles.Trajectory.nCoords))
-
-%handles.selected_coords-repmat([0 0 handles.coverslip.Z_offset],handles.nCoords,1)
-%handles.Trajectory.coords_matrix-repmat([0 0 handles.Calibration.window.Z_offset],handles.Trajectory.nCoords,1)
-%[handles.Calibration.window.center_coords handles.Calibration.window.Z_offset*0]
-%handles.Trajectory.coords_matrix-repmat([handles.Calibration.window.center_coords handles.Calibration.window.Z_offset],handles.Trajectory.nCoords,1)
-
-switch 2
+switch 3
     case 1
         A=handles.Trajectory.coords_matrix-repmat([handles.Calibration.window.center_coords handles.Calibration.window.Z_offset],handles.Trajectory.nCoords,1);
         
@@ -41,6 +31,14 @@ switch 2
                 disp('#frames unknown: scanimage is not running...')
             end
         end
+    case 3
+        if handles.stack_grid==2
+            handles.T_grid.clear()
+        end
+        handles.T_zStack.append(new_coord)
+        coord_matrix=cat(1,handles.T_zStack.coords.coord);
+        disp(coord_matrix)
+        %set(handles.hEdit03,'String',sprintf('nCoords=%d',handles.T_zStack.nCoords))
 end
 
 

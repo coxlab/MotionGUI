@@ -1,5 +1,5 @@
 function varargout=read_max_velocity(varargin)
-s=varargin{1};
+s=varargin{1}
 
 switch s.name
     case 'ESP301'

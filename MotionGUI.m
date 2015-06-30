@@ -15,6 +15,7 @@ delete(instrfindall)
 delete(timerfind)
 clc
 
+
 %% create main fig
 hFig=figure(3);
 set(hFig,'Name','Create motion trajectories','NumberTitle','Off','MenuBar','None','Position',[824    50   444   436],'Resize','On');
@@ -51,6 +52,8 @@ handles.Calibration=Calibration;
 handles.Trajectory=Trajectory;
 handles.coords=[0 0 0];
 
+
+
 %%% Create timer
 hTimer=timer('Name','TrajectoryTimer','Period',timerPeriod,'ExecutionMode','FixedSpacing','TimerFcn',@timerFcn,'userdata',handles);
 handles.hTimer=hTimer;
@@ -76,9 +79,10 @@ handles.goButton=uicontrol(hPanel_buttons,'Style','Pushbutton','Units','Normaliz
 handles.hEdit03=uicontrol(hPanel_buttons,'Style','Edit','Units','Normalized','Position',[button_init+button_spacing_left button_init+2*button_spacing_up button_width button_height],'String','nCoords=0');
 
 %%% Buttons to easily recalibrate the window positions
-
 hBut_calibrate=uicontrol(hPanel_buttons,'Style','Pushbutton','String','Cal','Units','Normalized','Position',[button_init+4*button_spacing_left button_init+2*button_spacing_up button_width/3 button_height],'Callback',{@switchButtons,'Calibrate'});
 hBut_moveStack=uicontrol(hPanel_buttons,'Style','Pushbutton','String','Mov','Units','Normalized','Position',[button_init+4.6*button_spacing_left button_init+2*button_spacing_up button_width/2.5 button_height],'Callback',{@switchButtons,'moveStack'});
+hBut_makeGrid=uicontrol(hPanel_buttons,'Style','Pushbutton','String','Grid','Units','Normalized','Position',[button_init+4*button_spacing_left button_init+0*button_spacing_up button_width/2.5 button_height],'Callback',{@switchButtons,'makeGrid'});
+hBut_clearGrid=uicontrol(hPanel_buttons,'Style','Pushbutton','String','Clr','Units','Normalized','Position',[button_init+4.6*button_spacing_left button_init+0*button_spacing_up button_width/2.5 button_height],'Callback',{@switchButtons,'clearGrid'});
 
 % move stack buttons
 handles.hBut08a=uicontrol(hPanel_buttons,'Style','Pushbutton','String','^','Units','Normalized','Position',[button_init+4.3*button_spacing_left button_init+2*button_spacing_up button_width/3 button_height],'Callback',{@moveStack,'Anterior'});
@@ -101,6 +105,11 @@ hBut16=uicontrol(hPanel_buttons,'Style','Pushbutton','String','Vel','Units','Nor
 
 %% add button to axis panel
 %uicontrol(hPanel_axis,'Style','togglebutton','String','CCD/2p','Units','Normalized','Position',[0 .95 .15 .05 ],'Callback',@toggleCCD2p);
+
+handles.stack_grid=1;
+handles.T_go2pos=trajectory('nextPos',hFig,handles.hEdit03,handles.goButton);
+handles.T_zStack=trajectory('zStack',hFig,handles.hEdit03,hBut07);
+handles.T_grid=trajectory('grid',hFig,handles.hEdit03,hBut07);
 
 guidata(hFig,handles)
 

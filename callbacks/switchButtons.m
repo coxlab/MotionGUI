@@ -29,4 +29,15 @@ switch mode
         set(handles.hBut10a,'visible','Off')
         set(handles.hBut11a,'visible','Off')
         set(handles.hBut12a,'visible','Off')
+    case 'makeGrid'
+        %handles.T_grid=;
+        %handles.T_grid.name='grid';
+        handles.T_grid.makeGrid3D(handles.T_zStack)
+        handles.stack_grid=2;
+    case 'clearGrid'
+        disp('Clearing grid')
+        handles.T_zStack.clear()
+        handles.T_grid.clear()
+        handles.stack_grid=1;
 end
+guidata(H,handles);

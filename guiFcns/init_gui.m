@@ -21,7 +21,12 @@ handles.plot_handles(1).p(4).h=plot([0 0],[-10 10],'k'); % AP
 handles.plot_handles(1).p(5).h=plot([-10 -10],[0 0],'k'); % ML
 
 % initiate current position marker
-handles.plot_handles(1).p(6).h=plot(6.5,6.5,'m*');
+handles.plot_handles(1).p(7).h=plot(0,0,'ko:'); % grid
+
+h=plot(6.5,6.5,'m*'); % indicator
+set(h,'ButtonDownFcn',@moveObj)
+handles.plot_handles(1).p(6).h=h;
+
 hold off
 axis equal
 axis ([-1 14 -1 14])
