@@ -4,15 +4,21 @@ global state
 try
     hTimer=varargin{1};
     userData=get(hTimer,'Userdata');
-    handles=guidata(userData.hFig);
     H=userData.hFig;
+    handles=guidata(H);
+    
+    %%% Load trajectory data
+    Trajectory=handles.Trajectory;
+    %handles.coords=Trajectory.target_coord;
+    %target=Trajectory.target_coord;
     
     % get position in absolute coordinates
     %raw_coords=getMotorPosition(handles.s);
     interface=handles.interface;
     interface.getPos();
     raw_coords=interface.cur_coords;
-    
+    %Trajectory.target_coord
+        
     if handles.ccd2p % add offset camera vs 2p
         %% BV20150416: incorporated known offset between centers of camera and 2p fields
         offset=[0.4724   -0.3665   -0.0488]; % in mm.
@@ -30,16 +36,16 @@ try
     end
     %distance=calc_dist([handles.coords(1:2) coords(1:2)]);
     
-    if handles.ccd2p % add offset camera vs 2p
-        %% BV20150416: incorporated known offset between centers of camera and 2p fields
-        offset=[0.4724   -0.3665   -0.0488]; % in mm.        
-        %handles.coords
-        %coords
-        distance=abs(sum(diff([handles.coords; coords])));
-    else
-        distance=abs(sum(diff([handles.coords; coords])));
-    end
-    
+%     if handles.ccd2p % add offset camera vs 2p
+%         %% BV20150416: incorporated known offset between centers of camera and 2p fields
+%         offset=[0.4724   -0.3665   -0.0488]; % in mm.        
+%         %handles.coords
+%         %coords
+%         distance=abs(sum(diff([handles.coords; coords])));
+%     else
+%         distance=abs(sum(diff([handles.coords; coords])));
+%     end
+%     
         
     %BV20150304 make sure scanimage has the coords, even if it started later
     
@@ -57,7 +63,13 @@ try
             set(handles.plot_handles(2).p(1),'faceColor','b')
         end
     end
+       
+    %distance=abs(sum(diff([target; coords])));
+    %[interface.cur_coords ; interface.target_coords]
+    distance=abs(sum(diff([interface.cur_coords ; interface.target_coords])));
+
     
+    %[handles.coords;coords]    
     if distance>.000001 % update coord on position chance
         
         %%% Move position indicator on x-y plot
@@ -72,14 +84,11 @@ try
         if isfield(state,'init')
             state.init.xyz.coords=coords;
         end
-    end
-    
-    %%% Load trajectory data
-    Trajectory=handles.Trajectory;
+    end        
     
     %Trajectory
-    %interface
-    % are we running a trajectory?
+    %interface    
+    % are we running a trajectory?    
     if Trajectory.running==1
         if Trajectory.Joystick==1
             interface.toggleJoystick('OFF')
@@ -88,15 +97,15 @@ try
             %fprintf(handles.s,msg);
             Trajectory.Joystick=interface.joystick;
         end
-        
+              
         %target=Trajectory.target_coord-[0 0 handles.Calibration.window.Z_offset];
         %target=Trajectory.target_coord-[handles.Calibration.window.center_coords handles.Calibration.window.Z_offset];
         if handles.Calibration.window.calibrated==1 %BV20150302 made conform to the conversion scripts
-            target=convertAbsRel(H,Trajectory.target_coord); % abs to rel            
+            %target=convertAbsRel(H,Trajectory.target_coord); % abs to rel            
         else
-            target=Trajectory.target_coord;
+            %target=Trajectory.target_coord;
         end
-           
+                
         if Trajectory.moving==0
             % handles velocities
             
@@ -119,20 +128,20 @@ try
             
             % go to next target position
             %setMotorPosition(handles.s,Trajectory.target_coord);
-            interface.setPos(Trajectory.target_coord);
+            interface.target_coords=Trajectory.target_coord;
+            interface.setPos();            
             
             % indicate motors are moving and we need to check for arrival
             % at target
             Trajectory.moving=1;
         end
-        
+                
         if Trajectory.moving==1
-            % check difference between current and target positions
-            distance=abs(sum(diff([target; coords])));
+            % check difference between current and target positions            
             
             interface.mockMove() % only for detached mode
             
-            if distance<.001
+            if distance<.001                
                 Trajectory.moving=0;
                 
                 if Trajectory.target_index<Trajectory.nCoords
@@ -146,11 +155,12 @@ try
                 end
             else
                 % keep moving
+                distance
             end
             
             % allow abort trajectory, is possible with command to ESP301
             if Trajectory.abort==1
-                Trajectory.finished=1;                
+                Trajectory.finished=1;
                 %stopMoving(handles.s)
                 interface.stop()
             end
@@ -195,4 +205,4 @@ catch
     A=lasterror;
     disp(A.message)
 end
-guidata(userData.hFig,handles)
+guidata(H,handles)

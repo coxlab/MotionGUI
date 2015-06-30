@@ -2,6 +2,7 @@ classdef serial_com_detached < handle
     
     properties
         name='';
+        s=[];
         H=[];
         max_velocities=[];
         joystick=0;

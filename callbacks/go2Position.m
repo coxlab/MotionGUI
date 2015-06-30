@@ -123,7 +123,7 @@ switch 2
         handles.Trajectory=Trajectory;
         
     case 2
-        str=get(handles.hEdit02,'string');
+        str=get(handles.hEdit02,'string')
         if strcmpi(str,'not running')
             % do nothing
         else
@@ -135,9 +135,8 @@ switch 2
             T_stack.clear()
             T_stack.append(coords)
             
-            interface=handles.interface;
-            if T_stack.running==0
-                
+            interface=handles.interface;            
+            if T_stack.running==0                
                 interface.iStep=0;
                 
                 T_stack.running=1;
