@@ -8,7 +8,10 @@ try
     H=userData.hFig;
     
     % get position in absolute coordinates
-    raw_coords=getMotorPosition(handles.s);
+    %raw_coords=getMotorPosition(handles.s);
+    interface=handles.interface;
+    interface.getPos();
+    raw_coords=interface.cur_coords;
     
     if handles.ccd2p % add offset camera vs 2p
         %% BV20150416: incorporated known offset between centers of camera and 2p fields
@@ -75,14 +78,15 @@ try
     Trajectory=handles.Trajectory;
     
     %Trajectory
-    
+    %interface
     % are we running a trajectory?
     if Trajectory.running==1
         if Trajectory.Joystick==1
+            interface.toggleJoystick('OFF')
             %%% Enable computer control
-            msg='EX JOYSTICK OFF';
-            fprintf(handles.s,msg);
-            Trajectory.Joystick=0;
+            %msg='EX JOYSTICK OFF';
+            %fprintf(handles.s,msg);
+            Trajectory.Joystick=interface.joystick;
         end
         
         %target=Trajectory.target_coord-[0 0 handles.Calibration.window.Z_offset];
@@ -98,21 +102,24 @@ try
             
             if Trajectory.target_index==1
                 % go max velocity
-                set_velocity(handles.s,Trajectory.max_velocities)                
+                interface.set_velocities(Trajectory.max_velocities)
+                %set_velocity(handles.s,Trajectory.max_velocities)
             else
                 % go according to set speed
-                set_velocity(handles.s,Trajectory.track_velocities)
+                %set_velocity(handles.s,Trajectory.track_velocities)
+                interface.set_velocities(Trajectory.track_velocities)
                 
                 %%% Take time stamp as we arrive at first position and move
                 %%% to second
-                if Trajectory.target_index==2
+                %if Trajectory.target_index==2
                     % record total duration of track
-                    Trajectory.start_time=clock;
-                end
+                %    Trajectory.start_time=clock;
+                %end
             end            
             
             % go to next target position
-            setMotorPosition(handles.s,Trajectory.target_coord);
+            %setMotorPosition(handles.s,Trajectory.target_coord);
+            interface.setPos(Trajectory.target_coord);
             
             % indicate motors are moving and we need to check for arrival
             % at target
@@ -122,14 +129,18 @@ try
         if Trajectory.moving==1
             % check difference between current and target positions
             distance=abs(sum(diff([target; coords])));
-                       
+            
+            interface.mockMove() % only for detached mode
+            
             if distance<.001
                 Trajectory.moving=0;
                 
                 if Trajectory.target_index<Trajectory.nCoords
                     % switch to next target
+                    %Trajectory.target_index=Trajectory.target_index+1;
+                    %Trajectory.target_coord=Trajectory.coords_matrix(Trajectory.target_index,:);
                     Trajectory.target_index=Trajectory.target_index+1;
-                    Trajectory.target_coord=Trajectory.coords_matrix(Trajectory.target_index,:);
+                    Trajectory.target_coord=Trajectory.coords(Trajectory.target_index).coord;
                 else                    
                     Trajectory.finished=1;
                 end
@@ -139,8 +150,9 @@ try
             
             % allow abort trajectory, is possible with command to ESP301
             if Trajectory.abort==1
-                Trajectory.finished=1;
-                stopMoving(handles.s)
+                Trajectory.finished=1;                
+                %stopMoving(handles.s)
+                interface.stop()
             end
             
             % check whether running trajectory is finished, replacing the obnocious
@@ -151,6 +163,7 @@ try
                 
                 if Trajectory.abort==1
                     disp('Trajectory aborted by user')
+                    Trajectory.abort=0;
                     pause(1)
                 else
                     %disp('Trajectory completed')
@@ -158,23 +171,27 @@ try
                 
                 % turn running flag off when last coord is reached
                 Trajectory.running=0;
+                Trajectory.moving=0;
                 
                 % switch button text back
                 %set(Trajectory.button_handle,'String','Start Trajectory')
                 set(Trajectory.button_handle,'String',Trajectory.default_string)
                 
                 %%% Enable joystick control
-                msg='EX JOYSTICK ON';
-                fprintf(handles.s,msg);
+                %msg='EX JOYSTICK ON';
+                %fprintf(handles.s,msg);
+                interface.toggleJoystick('ON')
                 Trajectory.Joystick=1;
                 
                 % reset velocities
-                set_velocity(handles.s,Trajectory.default_velocities)
+                %set_velocity(handles.s,Trajectory.default_velocities)
+                interface.set_velocities(Trajectory.default_velocities)
             end
         end
     end    
     handles.Trajectory=Trajectory;
 catch
+    rethrow(lasterror)
     A=lasterror;
     disp(A.message)
 end

@@ -1,27 +1,45 @@
-function varargout=openConnection(varargin)
+function openConnection(varargin)
 
-handles=guidata(varargin{1});
-if nargin>=3&&not(isempty(varargin{3}))
-    comport=varargin{3};
-else
-    comport='COM5';
+H=varargin{1};
+handles=guidata(H);
+
+if ispc
+    if nargin>=3&&not(isempty(varargin{3}))
+        comport=varargin{3};
+    else % use default value for 2p PC
+        comport='COM5';
+    end
+    
+    switch 1
+        case 1
+            s=serial(comport);
+            s.name='ESP301';
+            s.BaudRate=921600;
+            s.FlowControl='software';
+            s.Terminator='CR/LF';
+            s.Timeout=2;
+            
+            fopen(s);
+            
+            handles.s=s;
+            
+            msg='EX JOYSTICK ON';
+            fprintf(handles.s,msg);
+            
+            set(handles.hEdit01,'String','Connected')
+        case 2
+            handles.interface=serial_com(handles.hFig,'COM5');
+            handles.interface.open();
+            %set(handles.hEdit01,'String','Connected')
+    end
+else % not on pc, not running scim, go in detached mode
+    
+    %%% Create instance of detached class
+    interface=serial_com_detached(handles.hFig);
+    interface.open();
+    handles.interface=interface;
 end
 
-s=serial(comport);
-s.name='ESP301';
-s.BaudRate=921600;
-s.FlowControl='software';
-s.Terminator='CR/LF';
-s.Timeout=2;
- 
-fopen(s);
-
-handles.s=s;
-
-msg='EX JOYSTICK ON';
-fprintf(handles.s,msg);
-
-set(handles.hEdit01,'String','Connected')
 
 guidata(varargin{1},handles)
 
