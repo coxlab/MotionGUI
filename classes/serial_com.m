@@ -99,8 +99,16 @@ classdef serial_com < handle
             if nargin>=2
                 self.target_coords=varargin{2};            
             end
-            msg=sprintf('01PA%3.4f;02PA%3.4f;03PA%3.4f',self.target_coords)
-            self.send(msg)
+            switch 2
+                case 1
+                    msg=sprintf('01PA%3.4f;02PA%3.4f;03PA%3.4f',self.target_coords);
+                    self.send(msg)
+                case 2
+                    for iMot=1:3
+                        msg=sprintf('%02dPA%3.4f;',[iMot self.target_coords(iMot)]);
+                        self.send(msg)
+                    end
+            end
             %self.iStep=0;
             %self.nStep=20;
         end

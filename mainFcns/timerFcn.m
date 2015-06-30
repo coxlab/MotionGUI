@@ -128,8 +128,8 @@ try
             
             % go to next target position
             %setMotorPosition(handles.s,Trajectory.target_coord);
-            interface.target_coords=Trajectory.target_coord;
-            interface.setPos();            
+            interface.target_coords=Trajectory.target_coord
+            interface.setPos();           
             
             % indicate motors are moving and we need to check for arrival
             % at target
@@ -155,7 +155,7 @@ try
                 end
             else
                 % keep moving
-                distance
+%                distance
             end
             
             % allow abort trajectory, is possible with command to ESP301
