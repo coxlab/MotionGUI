@@ -32,7 +32,11 @@ switch mode
     case 'makeGrid'
         %handles.T_grid=;
         %handles.T_grid.name='grid';
-        handles.T_grid.makeGrid3D(handles.T_zStack)
+        if handles.ccd2p==1
+            handles.T_grid.makeGrid(handles.T_zStack)
+        else
+            handles.T_grid.makeGrid3D(handles.T_zStack)
+        end
         handles.stack_grid=2;
     case 'clearGrid'
         disp('Clearing grid')
