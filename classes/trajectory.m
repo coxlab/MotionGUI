@@ -79,13 +79,14 @@ classdef trajectory < handle
             if nargin>=3
                 shape=varargin{3};
             else
-                shape=2; % 1:rect | 2:circle
+                shape=1; % 1:rect | 2:circle
             end
             
+            self.clear()
             if T_zStack.nCoords==0
                 disp('No coords...')
             else
-                disp('Creating grid')
+                disp('Creating 2D grid')
                 M=cat(1,T_zStack.coords.coord);
                 FOV_size=[700 900]/1000;
                 overlap_factor=.80;
@@ -104,15 +105,17 @@ classdef trajectory < handle
                 G_x=G_x';
                 G_y=G_y';
                 %abs([mean(diff(X)) mean(diff(Y))])
-                if shape==2 % circle
+                if shape==1
+                    mask=true(size(G_x));
+                elseif shape==2 % circle
                     x=G_x-mean(G_x(:));
                     y=G_y-mean(G_y(:));
                     dist=sqrt(x.^2+y.^2);
-                    mask=dist<max([max(x(:)) max(y(:))])
+                    mask=dist<max([max(x(:)) max(y(:))]);
                     mask=mask(:)==1;
                 end
                 %output=[G_x(:) G_y(:) G_x(:)*0+M(1,3) G_x(:)*0];
-                output=[G_x(mask) G_y(mask) G_z(mask) G_x(mask)*0]
+                output=[G_x(mask) G_y(mask) G_z(mask) G_x(mask)*0];
                 self.batch_add(output);
             end
         end
@@ -122,13 +125,14 @@ classdef trajectory < handle
             %disp('Under construction')
             
             self=varargin{1};
-            
+                        
             T_zStack=varargin{2};
             
+            self.clear()
             if T_zStack.nCoords==0
                 disp('No coords...')
             else
-                disp('Creating grid')
+                disp('Creating 3D grid')
                 M=cat(1,T_zStack.coords.coord);
                 FOV_size=[336 430]/1000;
                 overlap_factor=1.80;
