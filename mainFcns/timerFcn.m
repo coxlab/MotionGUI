@@ -21,8 +21,8 @@ try
         
     if handles.ccd2p % add offset camera vs 2p
         %% BV20150416: incorporated known offset between centers of camera and 2p fields
-        offset=[0.4724   -0.3665   -0.0488]; % in mm.
-        raw_coords=raw_coords-offset;
+        %offset=[0.4724   -0.3665   -0.0488]; % in mm.
+        %raw_coords=raw_coords-offset;
     end
         
     % convert to window centered coordinates, if defined
@@ -69,9 +69,9 @@ try
     distance=abs(sum(diff([interface.cur_coords ; interface.target_coords])));
 
     
+
     %[handles.coords;coords]    
-    if distance>.000001 % update coord on position chance
-        
+    if distance>.000001 % update coord on position chance        
         %%% Move position indicator on x-y plot
         set(handles.plot_handles(1).p(6).h,'Xdata',plot_coords(1),'Ydata',plot_coords(2))
         set(handles.plot_handles(2).p(1),'Ydata',coords(3))
