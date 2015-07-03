@@ -10,6 +10,14 @@
 % To get cleaner images, the shutter will be closed before and after motor
 % movements and, for mode 2, when moving from one step to the next.
 
+% New features list:
+% - separate pause button
+% - allow function to pause trajectory and execute arbitrary code
+% - make display and target coord a separate box, with copy function to
+% grab current coordinate
+% - change velocities with parameter selection
+% - plot image on bg of trace, might need rainbow marker
+
 %clear all
 delete(instrfindall)
 delete(timerfind)
@@ -74,7 +82,7 @@ hBut06=uicontrol(hPanel_buttons,'Style','Pushbutton','String','Remove last','Uni
 hBut07=uicontrol(hPanel_buttons,'Style','Pushbutton','String','Start Trajectory','Units','Normalized','Position',[button_init+3*button_spacing_left button_init+2*button_spacing_up button_width button_height],'Callback',@runTrajectory);
 
 handles.hEdit01=uicontrol(hPanel_buttons,'Style','Edit','Units','Normalized','Position',[button_init button_init+button_spacing_up button_width button_height],'String','Disconnected');
-handles.hEdit02=uicontrol(hPanel_buttons,'Style','Edit','Units','Normalized','Position',[button_init+button_spacing_left button_init+button_spacing_up button_width*3 button_height],'String','Not Running');
+handles.hEdit02=uicontrol(hPanel_buttons,'Style','Edit','Units','Normalized','Position',[button_init+button_spacing_left button_init+button_spacing_up button_width*3 button_height],'String','Not Running','Callback',@coord_callback);
 handles.goButton=uicontrol(hPanel_buttons,'Style','Pushbutton','Units','Normalized','Position',[button_init+button_spacing_left+button_width*3 button_init+button_spacing_up button_width*.4 button_height],'String','GO','Callback',@go2Position);
 handles.hEdit03=uicontrol(hPanel_buttons,'Style','Edit','Units','Normalized','Position',[button_init+button_spacing_left button_init+2*button_spacing_up button_width button_height],'String','nCoords=0');
 
@@ -104,6 +112,10 @@ hBut15=uicontrol(hPanel_buttons,'Style','Pushbutton','String','Joystick','Units'
 hBut16=uicontrol(hPanel_buttons,'Style','Pushbutton','String','Vel','Units','Normalized','Position',[button_init+5*button_spacing_left button_init-1*button_spacing_up button_width/2 button_height],'Callback',@changeVelocities);
 
 %% add button to axis panel
+modality = uibuttongroup(hPanel_axis,'Visible','off','Units','Normalized','Position',[.01 .9 .3 .08],'SelectionChangedFcn',@toggle_ccd2p);
+r1 = uicontrol(modality,'Style','radiobutton','String','CCD','Units','Normalized','Position',[.1 .1 .5 .5],'HandleVisibility','off');
+r2 = uicontrol(modality,'Style','radiobutton','String','2p','Units','Normalized','Position',[.5 .1 .5 .5],'HandleVisibility','off');
+modality.Visible = 'on';
 %uicontrol(hPanel_axis,'Style','togglebutton','String','CCD/2p','Units','Normalized','Position',[0 .95 .15 .05 ],'Callback',@toggleCCD2p);
 
 handles.stack_grid=1;
