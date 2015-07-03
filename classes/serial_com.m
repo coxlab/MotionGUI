@@ -35,6 +35,7 @@ classdef serial_com < handle
         function open(varargin)
             self=varargin{1};
             
+            get(self.s)
             fopen(self.s)
             self.getPos();
             handles=guidata(self.H);
