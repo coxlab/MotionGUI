@@ -10,7 +10,7 @@ if ispc
         comport='COM5';
     end
     
-    switch 1
+    switch 2
         case 1
             s=serial(comport);
             s.name='ESP301';
@@ -28,7 +28,7 @@ if ispc
             
             set(handles.hEdit01,'String','Connected')
         case 2
-            handles.interface=serial_com(handles.hFig,'COM5');
+            handles.interface=serial_com(handles.hFig,comport);
             handles.interface.open();
             %set(handles.hEdit01,'String','Connected')
     end
