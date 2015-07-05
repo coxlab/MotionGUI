@@ -32,7 +32,7 @@ if ispc
             handles.interface.open();
             %set(handles.hEdit01,'String','Connected')
     end
-else % not on pc, not running scim, go in detached mode
+else % not on pc or not running scim, go in detached mode
     
     %%% Create instance of detached class
     interface=serial_com_detached(handles.hFig);
@@ -41,5 +41,6 @@ else % not on pc, not running scim, go in detached mode
 end
 
 
-guidata(varargin{1},handles)
+guidata(H,handles)
+update_gui(H)
 
