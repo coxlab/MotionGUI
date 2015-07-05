@@ -6,7 +6,7 @@ global state
 H=varargin{1};
 handles=guidata(H);
 
-switch 2
+switch 3
     case 1
         Trajectory=handles.Trajectory;
         
@@ -59,7 +59,7 @@ switch 2
                 T_stack=handles.T_grid;
         end
         interface=handles.interface;
-        if T_stack.running==0            
+        if T_stack.running==0
             interface.iStep=0;
             
             T_stack.running=1;
@@ -75,6 +75,20 @@ switch 2
         handles.T_grid=T_stack;
         handles.Trajectory=T_stack;
         handles.interface=interface;
+    case 3
+        if handles.stack_grid==1
+            T=handles.T_zStack;
+        else
+            T=handles.T_grid;
+        end
+        if T.running==0
+            T.target_index=1;
+            T.target_coord=T.coords(T.target_index).coord;
+            T.run()
+        else
+            T.abort()
+        end
+        
 end
 
 guidata(H,handles);

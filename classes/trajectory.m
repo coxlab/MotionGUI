@@ -2,7 +2,7 @@ classdef trajectory < handle
     % create separate trajectory for nextpos, z-trajectory and grid
     properties
         name='';
-        
+                
         coords_blank=struct('coord',[],'laser_power',[]);
         coords=[];
         nCoords=0;
@@ -12,7 +12,8 @@ classdef trajectory < handle
         
         running=0;
         moving=0;
-        abort=0;
+        paused=0;
+        aborted=0;
         finished=0;
         start_time=[];
         
@@ -25,6 +26,8 @@ classdef trajectory < handle
         default_string='';
         hFig=[];
         N_field=[];
+        
+        do_update=0;
     end
     
     
@@ -35,12 +38,14 @@ classdef trajectory < handle
             self.hFig=varargin{2};
             self.N_field=varargin{3};
             self.button_handle=varargin{4};
+            
             self.default_string=get(self.button_handle,'string');
             self.coords=self.coords_blank;
         end
         
         %%% Add coord
         function append(varargin)
+            %disp('appending...')
             self=varargin{1};
             new_coord=varargin{2};
             if nargin>=3
@@ -51,7 +56,8 @@ classdef trajectory < handle
             self.nCoords=self.nCoords+1;
             self.coords(self.nCoords).coord=new_coord;
             self.coords(self.nCoords).laser_power=laser_power;
-            self.update_GUI();
+            self.do_update=1;
+            %self.update_GUI();
         end
         
         %%% Take vectors and make trajectory
@@ -66,9 +72,10 @@ classdef trajectory < handle
                 self.coords(iCoord).coord=new_batch(iCoord,1:3);
                 self.coords(iCoord).laser_power=new_batch(iCoord,4);
             end
-            cat(1,self.coords.coord)
+            %cat(1,self.coords.coord)
             self.drawGrid()
-            self.update_GUI();
+            self.do_update=1;
+            %self.update_GUI();
         end
         
         %%% Create 2D grid
@@ -82,7 +89,7 @@ classdef trajectory < handle
                 shape=1; % 1:rect | 2:circle
             end
             
-            self.clear()
+            %self.clear()
             if T_zStack.nCoords==0
                 disp('No coords...')
             else
@@ -128,7 +135,7 @@ classdef trajectory < handle
                         
             T_zStack=varargin{2};
             
-            self.clear()
+            %self.clear()
             if T_zStack.nCoords==0
                 disp('No coords...')
             else
@@ -152,12 +159,12 @@ classdef trajectory < handle
                 N=length(G_x(:));
                 repeater=repmat(1:N,2,1);
                 depth_selector=repmat([1 2],1,N)';
-                output=[G_x(repeater(:)) G_y(repeater(:)) depth_values(depth_selector) G_x(repeater(:))*0];
+                
+                output=[G_x(repeater(:)) G_y(repeater(:)) depth_values(depth_selector(:)) G_x(repeater(:))*0];
                 self.batch_add(output);
             end
         end
-        
-        
+                
         function drawGrid(varargin)
             self=varargin{1};
             handles=guidata(self.hFig);
@@ -168,6 +175,88 @@ classdef trajectory < handle
             else
                 set(h,'xdata',M(:,1),'ydata',M(:,2))
             end
+        end 
+        
+        function run(varargin)
+            self=varargin{1};
+            
+            handles=guidata(self.hFig);
+            interface=handles.interface;
+            
+            interface.iStep=0;
+            interface.nStep=100;
+            interface.setPos(self.target_coord)
+            
+            %%% Set properties
+            self.running=1;
+            self.moving=1;
+            self.paused=0;
+            self.aborted=0;
+            self.finished=0;            
+            
+            %%% Raise flag to update
+            self.do_update=1;
+        end
+        
+        function finish(varargin)
+            self=varargin{1};
+            self.stop();
+        end
+                
+        
+        function abort(varargin)
+            self=varargin{1};            
+            self.aborted=1;
+            self.stop();
+        end
+        
+        function stop(varargin)
+            self=varargin{1};
+                        
+            if self.aborted==1
+                handles=guidata(self.hFig);
+                handles.interface.stop()
+                                
+                disp('Aborted by user')
+                self.aborted=0;
+            end
+            
+            self.running=0;
+            self.moving=0;
+            self.do_update=1;
+        end
+        
+        function out=run_checks(varargin)
+             self=varargin{1};
+             out=[self.is_running() self.is_moving()];
+             if self.is_aborted()==1
+                 self.running=0; 
+             end
+        end
+        
+        function check=is_running(varargin)
+             self=varargin{1};
+             check=self.running;
+        end
+        
+        function check=is_moving(varargin)
+             self=varargin{1};
+             check=self.moving;
+        end
+        
+        function check=is_paused(varargin)
+             self=varargin{1};
+             check=self.paused;
+        end
+        
+        function check=is_aborted(varargin)
+             self=varargin{1};
+             check=self.aborted;
+        end
+        
+        function check=is_finished(varargin)
+             self=varargin{1};
+             check=self.finished;
         end
         
         %%% Clear last
@@ -175,8 +264,10 @@ classdef trajectory < handle
             self=varargin{1};
             if self.nCoords>=1
                 self.coords(self.nCoords)=[];
-                self.nCoords=self.nCoords-1;
-                self.update_GUI();
+                %self.nCoords=self.nCoords-1;
+                self.nCoords=length(self.coords);
+                self.do_update=1;
+                %self.update_GUI();
             else
                 disp('No coords to delete')
             end
@@ -188,15 +279,8 @@ classdef trajectory < handle
             self.coords=self.coords_blank;
             self.nCoords=0;
             self.drawGrid()
-            self.update_GUI();
+            self.do_update=1;
         end
         
-        %%% Update N
-        function update_GUI(varargin)
-            disp('update')
-            self=varargin{1};
-            set(self.N_field,'string',sprintf('N=%d',self.nCoords))
-        end
-    end
-    
+    end    
 end

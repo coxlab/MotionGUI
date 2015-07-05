@@ -41,5 +41,4 @@ switch 3
         %set(handles.hEdit03,'String',sprintf('nCoords=%d',handles.T_zStack.nCoords))
 end
 
-
 guidata(H,handles)

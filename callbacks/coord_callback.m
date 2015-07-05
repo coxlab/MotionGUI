@@ -9,4 +9,4 @@ coords=sscanf(str,'%*s %f ; ')';
 handles.target_coords=coords;
 guidata(H,handles);
 
-handles.target_coords
+% handles.target_coords

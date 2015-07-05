@@ -123,35 +123,19 @@ switch 2
         handles.Trajectory=Trajectory;
         
     case 2
-        str=get(handles.hEdit02,'string')
+        str=get(handles.hEdit02,'string');
         if strcmpi(str,'not running')
             % do nothing
         else
-            % attempt to decode the string
-            str=strrep(str,'=',' '); % remove =-signs to allow decoding
-            coords=sscanf(str,'%*s %f ; ')';
-                        
-            T_stack=handles.T_go2pos;
-            T_stack.clear()
-            T_stack.append(coords)
-            
-            interface=handles.interface;            
-            if T_stack.running==0                
-                interface.iStep=0;
-                
-                T_stack.running=1;
-                T_stack.abort=0;
-                T_stack.finished=0;
-                T_stack.moving=0;
-                T_stack.target_index=1;
-                T_stack.target_coord=T_stack.coords(T_stack.target_index).coord;
-                set(H,'String','Abort?')
+            T=handles.T_go2pos;
+            if T.running==0
+                % parsing the coord string
+                str=strrep(str,'=',' '); % replace '='-signs by spaces to allow proper parsing
+                T.target_coord=sscanf(str,'%*s %f ; ')';
+                T.run();
             else
-                T_stack.abort=1;
+                T.abort();
             end
-            handles.T_go2pos=T_stack;
-            handles.Trajectory=T_stack;
-            handles.interface=interface;
         end
 end
 guidata(H,handles)

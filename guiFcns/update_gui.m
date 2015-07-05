@@ -1,6 +1,60 @@
 function update_gui(varargin)
+% This function deserves a massive upgrade!
+% All objects will be read out and synced up to the GUI using this function
+% E.g. the number of coordinates!
+% Only when changes are to be plotted, have flag attached to each object to
+% indicate update is needed
 
-handles=guidata(varargin{1});
+
+H=varargin{1};
+handles=guidata(H);
+
+%%% Serial interface
+interface=handles.interface;
+if interface.do_update==1
+        
+    %%% Remove flag
+    interface.do_update=0;
+end
+
+%%% Trajectory go2pos
+T=handles.T_go2pos;
+if T.do_update==1
+    
+    if T.running==1
+        str='Abort';
+    else        
+        str='GO';
+    end
+    set(T.button_handle,'String',str)
+    
+    %%% Reset flag
+    T.do_update=0;
+end
+
+%%% Trajectory stack/grid
+if handles.stack_grid==1
+    T=handles.T_zStack;
+else
+    T=handles.T_grid;
+end
+if T.do_update==1
+    str=sprintf('N=%d',T.nCoords);
+    set(handles.hEdit03,'String',str)
+    
+    if T.running==1
+        str='Abort';
+    else        
+        str=T.default_string;
+    end
+    set(T.button_handle,'String',str)
+    
+    %%% Remove flag
+    T.do_update=0;
+end
+
+
+%%% Calibration
 Calibration=handles.Calibration;
 replotRect(handles.plot_handles(1).p(1).h,handles.Calibration.coordinate_system.rect,'k')
 
@@ -33,4 +87,4 @@ else
     replotCircle(handles.plot_handles(1).p(3).h,[-10 -10],0,100,'-');    
 end
 
-guidata(handles.hFig,handles);
+guidata(H,handles);

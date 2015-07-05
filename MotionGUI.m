@@ -17,6 +17,23 @@
 % grab current coordinate
 % - change velocities with parameter selection
 % - plot image on bg of trace, might need rainbow marker
+% - plot current and past FOVs
+% - make grid button show dialogue where properties can be selected: 2d or
+% 3d and rect vs. circle
+% - make easy conversion for mm to pixel space
+% add update gui function to sync objects to GUI and vice versa, take all
+% reference to the GUI out of the class definitions
+
+% ways to tackle no coord update issue (in order of feasibility)
+% - do nothing, and hope issue resolved itself
+% - check properties of serial object: are we using the right baudrate and
+% such?
+% - add callback to coord-box, already implemented, does this work?
+% - add separate current coord and target coord boxes. no interplay between
+% showing and setting
+% - ...
+
+
 
 %clear all
 delete(instrfindall)
@@ -53,11 +70,11 @@ headplate=struct('calibrated',1,'center_coords',[9.4639 7.1563],'radius',12/2);
 window_reset=struct('calibrated',0,'coords',zeros(5,3),'Z_offset',0,'coords_collected',zeros(5,1),'show_AP',0,'show_ML',0);
 
 Calibration=struct('coordinate_system',coordinate_system,'headplate',headplate,'window',window_reset,'window_reset',window_reset);
-Trajectory=struct('coords_matrix',[],'nCoords',0,'target_coord',0,'target_index',0,'velocity',0,'running',0);
+%Trajectory=struct('coords_matrix',[],'nCoords',0,'target_coord',0,'target_index',0,'velocity',0,'running',0);
 
 handles=struct('hFig',hFig,'hPanel_axis',hPanel_axis,'comport',comport,'coords',[0 0 0],'mode',0,'velocity',[],'nSteps',0,'dwell_time',1,'s',[],'current_config',0,'ccd2p',0);
 handles.Calibration=Calibration;
-handles.Trajectory=Trajectory;
+%handles.Trajectory=Trajectory;
 handles.coords=[0 0 0];
 
 
@@ -122,6 +139,9 @@ handles.stack_grid=1;
 handles.T_go2pos=trajectory('nextPos',hFig,handles.hEdit03,handles.goButton);
 handles.T_zStack=trajectory('zStack',hFig,handles.hEdit03,hBut07);
 handles.T_grid=trajectory('grid',hFig,handles.hEdit03,hBut07);
+
+%%% Use T_go2pos as default Trajectory
+handles.Trajectory=handles.T_go2pos;
 
 guidata(hFig,handles)
 

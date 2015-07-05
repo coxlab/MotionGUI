@@ -14,6 +14,7 @@ classdef serial_com < handle
         target_coords=[];
         iStep=[];
         nStep=[];
+        do_update=0;
     end
     
     methods

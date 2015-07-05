@@ -8,8 +8,11 @@ classdef serial_com_detached < handle
         joystick=0;
         cur_coords=[];
         target_coords=[];
+        %distance=[];
+        tolerance=1e-7;
         iStep=[];
         nStep=[];
+        do_update=0;
     end
     
     methods
@@ -22,6 +25,8 @@ classdef serial_com_detached < handle
             else
                 self.H=gcf;
             end
+            self.getPos();
+            self.target_coords=[0 0 0];
             self.max_velocities=[.4 .4 .4];
         end
         
@@ -60,9 +65,16 @@ classdef serial_com_detached < handle
         %%% Set position
         function setPos(varargin)
             self=varargin{1};
-            self.target_coords=varargin{2};
+            if nargin>=2
+                self.target_coords=varargin{2};    
+            end
             self.iStep=0;
             self.nStep=20;
+        end
+        
+        function d=getDist(varargin)
+            self=varargin{1};
+            d=sqrt(sum(diff([self.cur_coords; self.target_coords]).^2));
         end
         
         %%% Build trajectory
@@ -71,12 +83,13 @@ classdef serial_com_detached < handle
         %%% Mock move
         function mockMove(varargin)
             self=varargin{1};
-            %sself.target_coords
-            handles=guidata(self.H);
-            
+            %self.target_coords
+                        
             %%% move gently for current position to another
             factor=self.iStep/self.nStep;
             distance_vector=diff([self.cur_coords ; self.target_coords])*factor;
+            
+            handles=guidata(self.H);
             
             h_xy=handles.plot_handles(1).p(6).h;
             set(h_xy,'Xdata',self.cur_coords(1)+distance_vector(1),'Ydata',self.cur_coords(2)+distance_vector(2))

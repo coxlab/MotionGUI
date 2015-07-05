@@ -40,8 +40,9 @@ switch mode
         handles.stack_grid=2;
     case 'clearGrid'
         disp('Clearing grid')
-        handles.T_zStack.clear()
-        handles.T_grid.clear()
+        %handles.T_zStack.clear()
+        handles.T_grid.clear();
         handles.stack_grid=1;
+        handles.T_zStack.do_update=1;
 end
 guidata(H,handles);
