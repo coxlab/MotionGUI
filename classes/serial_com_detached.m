@@ -3,13 +3,25 @@ classdef serial_com_detached < handle
     properties
         name='';
         s=[];
+        connected=0;
+        conn_str='';
+        deconn_str='';
         H=[];
-        max_velocities=[];
+        
+        max_velocities=[]; % max possible
+        default_velocities=[]; % nice average
+        track_velocities=[]; % placeholder for calculated coords
+        track_speed=[];
+        cur_velocities=[]; % used for current/next move
+        
         joystick=0;
+        
         cur_coords=[];
+        last_coords=[];
         target_coords=[];
-        %distance=[];
+        distance=[];
         tolerance=1e-7;
+        update_position=1;
         iStep=[];
         nStep=[];
         do_update=0;
@@ -25,16 +37,23 @@ classdef serial_com_detached < handle
             else
                 self.H=gcf;
             end
-            self.getPos();
-            self.target_coords=[0 0 0];
+            
             self.max_velocities=[.4 .4 .4];
+            self.cur_velocities=[0 0 0];
+            self.default_velocities=[.2 .2 .2];
+            self.conn_str='Detached';
+            self.deconn_str='Not connected';
         end
         
         %%% Open
         function open(varargin)
             self=varargin{1};
-            handles=guidata(self.H);
-            set(handles.hEdit01,'String','Detached mode')
+            
+            self.getPos();
+            self.target_coords=[0 0 0];
+            self.track_speed=.1;
+            self.connected=1;
+            self.do_update=1;
         end
         
         %%% Get position
@@ -45,7 +64,19 @@ classdef serial_com_detached < handle
             handles=guidata(self.H);
             h_xy=handles.plot_handles(1).p(6).h;
             h_z=handles.plot_handles(2).p(1);
+            
+            %%% Hacky way of getting to current actual stage positions,
+            %%% read it from the GUI since we have no access to the ESP301
+            %%% motion controller.
             self.cur_coords=[get(h_xy,'Xdata') get(h_xy,'Ydata') get(h_z,'Ydata')];
+            
+            %%% Only update position on GUI once
+            self.distance=self.getDistMoved();
+            if self.distance>self.tolerance
+                self.update_position=1;
+                self.do_update=1;
+                self.last_coords=self.cur_coords;
+            end
         end
         
         %%% Toggle joystick dummy
@@ -55,12 +86,32 @@ classdef serial_com_detached < handle
             return
         end
         
-        %%% set_velocities
-        function set_velocities(varargin)
-            %self=varargin{1};
-            %velocity=varargin{2};
+        function joystickOn(varargin)
+            self=varargin{1};
+            self.joystick=1;
             return
         end
+                
+        function joystickOff(varargin)
+            self=varargin{1};
+            self.joystick=0;
+            return
+        end
+        
+        %%% calc and set velocities
+        function calc_velocities(varargin)
+            self=varargin{1};
+            distances=diff([self.cur_coords;self.target_coords]);
+            self.track_velocities=abs(distances./self.getDist()*self.track_speed);
+            %self.track_velocities
+        end
+        
+        function set_velocities(varargin)
+            self=varargin{1};
+            self.cur_velocities=varargin{2};
+            %velocity=varargin{2};            
+        end
+        
         
         %%% Set position
         function setPos(varargin)
@@ -70,6 +121,11 @@ classdef serial_com_detached < handle
             end
             self.iStep=0;
             self.nStep=20;
+        end
+        
+        function d=getDistMoved(varargin)
+            self=varargin{1};
+            d=sqrt(sum(diff([self.cur_coords; self.last_coords]).^2));
         end
         
         function d=getDist(varargin)
