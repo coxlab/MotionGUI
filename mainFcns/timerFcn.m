@@ -67,22 +67,18 @@ try
     %distance=abs(sum(diff([target; coords])));
     %[interface.cur_coords ; interface.target_coords]
     distance=abs(sum(diff([interface.cur_coords ; interface.target_coords])));
-        
+    %interface
     
     %[handles.coords;coords]
-    if distance>interface.tolerance % update coord on position chance
-        %%% Move position indicator on x-y plot
-        set(handles.plot_handles(1).p(6).h,'Xdata',plot_coords(1),'Ydata',plot_coords(2))
-        set(handles.plot_handles(2).p(1),'Ydata',coords(3))
-        set(handles.plot_handles(2).p(2),'String',sprintf('%3.4f',coords(3)))
-        
-        string=sprintf('X=%03.4f ; Y=%03.4f ; Z=%03.4f',coords);
-        set(handles.hEdit02,'String',string)
-        
+    %%% Update position on gui
+    if interface.update_position==1
+                
         handles.coords=coords;
         if isfield(state,'init')
             state.init.xyz.coords=coords;
         end
+        
+        
     end
     
     %Trajectory
@@ -212,13 +208,16 @@ try
             
             %%% Handle go2pos moves
             T=handles.T_go2pos;
-            %checks=T.run_checks();
+            %checks=T.run_checks();            
             if T.is_moving==1
+                interface.joystickOff()
+                interface.set_velocities(interface.max_velocities)
                 interface.mockMove() % only for detached mode 
-                
                 if interface.getDist()<interface.tolerance
                     T.finish()
                 end
+                interface.set_velocities(interface.default_velocities)
+                interface.joystickOn()
             end
             
             if handles.stack_grid==1
@@ -229,6 +228,9 @@ try
                 T=handles.T_grid;
             end
             if T.is_moving
+                interface.joystickOff()
+                interface.set_velocities(interface.max_velocities)
+                %interface.setVelocties(interface.max_velocities)
                 interface.mockMove() % only for detached mode 
                 
                 if interface.getDist()<interface.tolerance                    
@@ -236,11 +238,17 @@ try
                         T.target_index=T.target_index+1;
                         T.target_coord=T.coords(T.target_index).coord;
                         interface.iStep=0;
+                        
                         interface.target_coords=T.target_coord;
+                        
+                        interface.calc_velocities() % get velocities for each axis separately
+                        interface.set_velocities(interface.track_velocities)
                     else                        
                         T.finish()
                     end
                 end
+                interface.set_velocities(interface.default_velocities)
+                interface.joystickOn()
             end
             
                 
