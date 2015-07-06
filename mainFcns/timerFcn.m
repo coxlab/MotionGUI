@@ -72,7 +72,7 @@ try
     %[handles.coords;coords]
     %%% Update position on gui
     if interface.update_position==1
-                
+        
         handles.coords=coords;
         if isfield(state,'init')
             state.init.xyz.coords=coords;
@@ -208,11 +208,11 @@ try
             
             %%% Handle go2pos moves
             T=handles.T_go2pos;
-            %checks=T.run_checks();            
+            %checks=T.run_checks();
             if T.is_moving==1
                 interface.joystickOff()
                 interface.set_velocities(interface.max_velocities)
-                interface.mockMove() % only for detached mode 
+                interface.mockMove() % only for detached mode
                 if interface.getDist()<interface.tolerance
                     T.finish()
                 end
@@ -231,9 +231,9 @@ try
                 interface.joystickOff()
                 interface.set_velocities(interface.max_velocities)
                 %interface.setVelocties(interface.max_velocities)
-                interface.mockMove() % only for detached mode 
+                interface.mockMove() % only for detached mode
                 
-                if interface.getDist()<interface.tolerance                    
+                if interface.getDist()<interface.tolerance
                     if T.target_index<T.nCoords
                         T.target_index=T.target_index+1;
                         T.target_coord=T.coords(T.target_index).coord;
@@ -243,7 +243,7 @@ try
                         
                         interface.calc_velocities() % get velocities for each axis separately
                         interface.set_velocities(interface.track_velocities)
-                    else                        
+                    else
                         T.finish()
                     end
                 end
@@ -251,23 +251,20 @@ try
                 interface.joystickOn()
             end
             
-                
-            
-                        
             
             
-%             if T.is_aborted()==1
-%                 %disp('abort!')
-%                 %interface.stop()
-%                 T.aborted=0;
-%                 T.finished=1;
-%             end
+            %             if T.is_aborted()==1
+            %                 %disp('abort!')
+            %                 %interface.stop()
+            %                 T.aborted=0;
+            %                 T.finished=1;
+            %             end
             
-%             if T.is_finished()
-%                 T.running=0;
-%                 T.moving=0;
-%                 T.do_update()
-%             end
+            %             if T.is_finished()
+            %                 T.running=0;
+            %                 T.moving=0;
+            %                 T.do_update()
+            %             end
             
     end
     handles.Trajectory=Trajectory;
