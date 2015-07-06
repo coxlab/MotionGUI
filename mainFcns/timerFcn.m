@@ -258,19 +258,22 @@ try
                             if interface.getDist()>interface.tolerance
                                 % no 
                                 %interface.joystick                                                                
-                            else % clean up
+                            else % clean up                                                               
                                 % yes
+                                %%% execute arbitrary function
+                                if handles.ccd2p==1
+                                    % take picture
+                                    disp('taking picture')
+                                    im=getsnapshot(handles.ccd01);
+                                    figure(1)
+                                    imshow(im,[])
+                                else
+                                end
+                                
                                 if T.target_index==T.nCoords
                                     disp('no more coordinates')
                                     T.finish()
-                                else % advance to next position
-                                    
-                                    %%% execute arbitrary function
-                                    if handles.ccd2p==1
-                                        % take picture
-                                        
-                                    else
-                                    end
+                                else % advance to next position                                                                        
                                     
                                     %disp('what now?')
                                     T.target_index=T.target_index+1;
