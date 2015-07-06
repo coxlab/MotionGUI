@@ -5,6 +5,7 @@ classdef serial_com < handle
         %H=[];
         %joystick=0;
         %coords=[0 0 0];
+        status=[];
         connected=0;
         conn_str='';
         deconn_str='';
@@ -14,14 +15,16 @@ classdef serial_com < handle
         max_velocities=[]; % max possible
         default_velocities=[]; % nice average
         track_velocities=[]; % placeholder for calculated coords
+        track_speed=[];
         cur_velocities=[]; % used for current/next move
+        stages_moving=[];
         
         joystick=0;
         cur_coords=[];
         last_coords=[];
         target_coords=[];
         distance=[];
-        tolerance=1e-7;
+        tolerance=1e-4;
         update_position=1;
         iStep=[];
         nStep=[];
@@ -43,11 +46,7 @@ classdef serial_com < handle
             self.s.Timeout=2;
             
             self.conn_str='Connected';
-            self.deconn_str='Disconnected';
-                         
-            self.get_max_velocities()
-            self.cur_velocities=[0 0 0];
-            self.default_velocities=[.2 .2 .2];            
+            self.deconn_str='Disconnected';                                     
         end
         
         %%% Open
@@ -56,7 +55,13 @@ classdef serial_com < handle
             
             %%% Open serial connection to ESP301
             fopen(self.s)
-            get(self.s)
+            %get(self.s)
+            
+            self.get_max_velocities()
+            self.cur_velocities=[0 0 0];
+            self.default_velocities=[.2 .2 .2];
+            self.stages_moving=[0 0 0];
+            self.track_speed=.01;
             
             self.target_coords=[0 0 0];            
             self.getPos(); % Update position
@@ -71,44 +76,64 @@ classdef serial_com < handle
             fprintf(self.s,msg);
         end
         
-        %%% Joystick
-        function toggleJoystick(varargin)
-            self=varargin{1};
-            target_state=varargin{2};
-            switch target_state
-                case 'ON'
-                    msg='EX JOYSTICK ON';
-                    cur_state=1;
-                case 'OFF'
-                    msg='EX JOYSTICK OFF';
-                    cur_state=0;
-                case 'TOGGLE'
-                    if self.joystick==0
-                        msg='EX JOYSTICK ON';
-                        cur_state=1;
-                    else
-                        msg='EX JOYSTICK OFF';
-                        cur_state=0;
-                    end
-            end
-            self.send(msg)
-            self.joystick=cur_state;
+        function str=readString(varargin)
+           self=varargin{1};  
+           if nargin>=2
+               format=varargin{2};
+           else
+               format='%f';
+           end
+           if get(self.s,'BytesAvailable')>0
+               str=fscanf(self.s,format);
+           else
+               str='';
+           end
         end
+        
+        %%% Joystick
+%         function toggleJoystick(varargin)
+%             self=varargin{1};
+%             target_state=varargin{2};
+%             switch target_state
+%                 case 'ON'
+%                     msg='EX JOYSTICK ON';
+%                     cur_state=1;
+%                 case 'OFF'
+%                     msg='EX JOYSTICK OFF';
+%                     cur_state=0;
+%                 case 'TOGGLE'
+%                     if self.joystick==0
+%                         msg='EX JOYSTICK ON';
+%                         cur_state=1;
+%                     else
+%                         msg='EX JOYSTICK OFF';
+%                         cur_state=0;
+%                     end
+%             end
+%             self.send(msg)
+%             self.joystick=cur_state;
+%         end
         
         function joystickOn(varargin)
             self=varargin{1};
-            msg='EX JOYSTICK ON';
-            self.send(msg)
-            self.joystick=1;
-            return
+            
+%             self.getMoving()
+%             if any(self.stages_moving)
+%                 disp('Stage are still running..')
+            if self.motionDone()
+                msg='EX JOYSTICK ON';
+                self.send(msg)
+                self.joystick=1;
+            end                                    
         end
         
         function joystickOff(varargin)
             self=varargin{1};
-            msg='EX JOYSTICK OFF';
-            self.send(msg)
-            self.joystick=0;
-            return
+            if self.motionDone()
+                msg='EX JOYSTICK OFF';
+                self.send(msg)
+                self.joystick=0;
+            end
         end
         
         %%% get current position
@@ -130,6 +155,29 @@ classdef serial_com < handle
                 self.last_coords=self.cur_coords;
             end
         end
+        
+        function getMoving(varargin)
+            self=varargin{1};
+            moving=zeros(1,3);
+            for iAxis=1:3
+                msg=sprintf('%02dMD',iAxis);
+                self.send(msg)
+                moving(iAxis)=fscanf(self.s,'%f');
+            end
+            %%% MD stands for Motion Done, so 1 when stopped
+            self.stages_moving=moving==0;
+        end
+        
+        function done=motionDone(varargin)
+            self=varargin{1};
+            self.getMoving()
+            if any(self.stages_moving)
+                %disp('Stage are still running..')
+                done=0;
+            else
+                done=1;
+            end
+        end
                         
         %%% get,calc and set velocities
         function get_max_velocities(varargin)
@@ -148,8 +196,10 @@ classdef serial_com < handle
                 
         function calc_velocities(varargin)
             self=varargin{1};
-            distances=diff([self.cur_coords;self.target_coords]);
-            self.track_velocities=abs(distances./self.getDist()*self.track_speed);
+            distances=diff([self.cur_coords;self.target_coords]);            
+            if any(distances)
+                self.track_velocities=abs(distances./self.getDist()*self.track_speed);
+            end                        
             %self.track_velocities
         end
         
@@ -161,23 +211,19 @@ classdef serial_com < handle
         end
         
         %%% Set position
-        function setPos(varargin)            
+        function setTarget(varargin)
             self=varargin{1};
             if nargin>=2
-                self.target_coords=varargin{2};            
+                self.target_coords=varargin{2};
+            else
+                disp('empty coords, nothing changed...')
             end
-            switch 2
-                case 1
-                    msg=sprintf('01PA%3.4f;02PA%3.4f;03PA%3.4f',self.target_coords);
-                    self.send(msg)
-                case 2
-                    for iMot=1:3
-                        msg=sprintf('%02dPA%3.4f;',[iMot self.target_coords(iMot)]);
-                        self.send(msg)
-                    end
-            end
-            %self.iStep=0;
-            %self.nStep=20;
+        end
+        
+        function go2target(varargin)
+            self=varargin{1};
+            msg=sprintf('01PA%3.4f;02PA%3.4f;03PA%3.4f',self.target_coords);
+            self.send(msg)
         end
         
         %%% mockmove dummy
@@ -192,6 +238,7 @@ classdef serial_com < handle
         
         function d=getDist(varargin)
             self=varargin{1};
+            %[self.cur_coords; self.target_coords]
             d=sqrt(sum(diff([self.cur_coords; self.target_coords]).^2));
         end
         
@@ -204,7 +251,26 @@ classdef serial_com < handle
             self.send(msg);
         end
         
+        function status=getStatus(varargin)
+            self=varargin{1};
+            msg='TS'; % PH for hardware status
+            self.send(msg);
+            status=fscanf(self.s,'%c');
+            self.status=dec2binvec(double(status(1)),8);
+        end
         
-        
+        %%% Error handling
+        function getErrorMsg(varargin)
+            self=varargin{1}; 
+            msg='TE'; % TB for msg
+            self.send(msg);
+            err=self.readString();
+            if err~=0
+                msg='TB';
+                self.send(msg);
+                msg=self.readString('%s');
+                disp(msg)
+            end
+        end               
     end
 end

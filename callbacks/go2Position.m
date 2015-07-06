@@ -3,12 +3,12 @@ function go2Position(varargin)
 % coord and adaptable speed
 H=varargin{1};
 handles=guidata(H);
+interface=handles.interface;
 
 switch 2
     case 1
         Trajectory=handles.Trajectory;
-        
-        interface=handles.interface;
+                
         switch interface.name
             case 'detached'
                 str=get(handles.hEdit02,'string');
@@ -131,8 +131,10 @@ switch 2
             if T.running==0
                 % parsing the coord string
                 str=strrep(str,'=',' '); % replace '='-signs by spaces to allow proper parsing
-                T.target_coord=sscanf(str,'%*s %f ; ')';
-                T.run();
+                T.target_coord=sscanf(str,'%*s %f ; ')';                
+                %interface.target_coords=sscanf(str,'%*s %f ; ')';                
+                interface.setTarget(T.target_coord)
+                T.run();              
             else
                 T.abort();
             end

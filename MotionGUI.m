@@ -38,6 +38,7 @@
 %clear all
 delete(instrfindall)
 delete(timerfind)
+delete(imaqfind)
 clc
 
 
@@ -76,6 +77,20 @@ handles=struct('hFig',hFig,'hPanel_axis',hPanel_axis,'comport',comport,'coords',
 handles.Calibration=Calibration;
 %handles.Trajectory=Trajectory;
 handles.coords=[0 0 0];
+
+%%% Add video capture capabilities
+highres=0;
+if highres==0
+    %vid = videoinput('winvideo', 1, 'Y800_1280x960');
+    vid = videoinput('winvideo', 2, 'Y16 _1024x768');
+else
+    vid = videoinput('winvideo', 1, 'Y16 _2592x1944');
+end
+%src = getselectedsource(vid);
+
+handles.ccd01=vid;
+
+
 
 
 
@@ -129,7 +144,7 @@ hBut15=uicontrol(hPanel_buttons,'Style','Pushbutton','String','Joystick','Units'
 hBut16=uicontrol(hPanel_buttons,'Style','Pushbutton','String','Vel','Units','Normalized','Position',[button_init+5*button_spacing_left button_init-1*button_spacing_up button_width/2 button_height],'Callback',@changeVelocities);
 
 %% add button to axis panel
-modality = uibuttongroup(hPanel_axis,'Visible','off','Units','Normalized','Position',[.01 .9 .3 .08],'SelectionChangedFcn',@toggle_ccd2p);
+modality = uibuttongroup(hPanel_axis,'Visible','off','Units','Normalized','Position',[.01 .9 .3 .08]);%,'SelectionChangedFcn',@toggle_ccd2p);
 r1 = uicontrol(modality,'Style','radiobutton','String','CCD','Units','Normalized','Position',[.1 .1 .5 .5],'HandleVisibility','off');
 r2 = uicontrol(modality,'Style','radiobutton','String','2p','Units','Normalized','Position',[.5 .1 .5 .5],'HandleVisibility','off');
 modality.Visible = 'on';

@@ -2,7 +2,7 @@ classdef trajectory < handle
     % create separate trajectory for nextpos, z-trajectory and grid
     properties
         name='';
-                
+        
         coords_blank=struct('coord',[],'laser_power',[]);
         coords=[];
         nCoords=0;
@@ -132,7 +132,7 @@ classdef trajectory < handle
             %disp('Under construction')
             
             self=varargin{1};
-                        
+            
             T_zStack=varargin{2};
             
             %self.clear()
@@ -143,19 +143,20 @@ classdef trajectory < handle
                 M=cat(1,T_zStack.coords.coord);
                 FOV_size=[336 430]/1000;
                 overlap_factor=1.80;
-                                
+                
                 V=FOV_size(1)*overlap_factor;
                 H=FOV_size(2)*overlap_factor;
                 D=abs(diff(M));
                 nRows=ceil(D(2)/V);
                 nCols=ceil(D(1)/H);
-                X=linspace(M(1,1),M(2,1),nCols);
-                Y=linspace(M(1,2),M(2,2),nRows);
+                X=linspace(M(1,1),M(2,1),nCols)
+                Y=linspace(M(1,2),M(2,2),nRows)
                 [G_x,G_y]=meshgrid(X,Y);
-                G_x=G_x';
-                G_y=G_y';
-
+                G_x=G_x(:);
+                G_y=G_y(:);
+                
                 depth_values=M(:,3);
+                depth_values=depth_values(:);
                 N=length(G_x(:));
                 repeater=repmat(1:N,2,1);
                 depth_selector=repmat([1 2],1,N)';
@@ -164,7 +165,7 @@ classdef trajectory < handle
                 self.batch_add(output);
             end
         end
-                
+        
         function drawGrid(varargin)
             self=varargin{1};
             handles=guidata(self.hFig);
@@ -175,7 +176,7 @@ classdef trajectory < handle
             else
                 set(h,'xdata',M(:,1),'ydata',M(:,2))
             end
-        end 
+        end
         
         function run(varargin)
             self=varargin{1};
@@ -185,14 +186,14 @@ classdef trajectory < handle
             
             interface.iStep=0;
             interface.nStep=100;
-            interface.setPos(self.target_coord)
+            interface.set_velocities(interface.max_velocities)            
             
             %%% Set properties
             self.running=1;
-            self.moving=1;
+            self.moving=0;
             self.paused=0;
             self.aborted=0;
-            self.finished=0;            
+            self.finished=0;
             
             %%% Raise flag to update
             self.do_update=1;
@@ -200,63 +201,70 @@ classdef trajectory < handle
         
         function finish(varargin)
             self=varargin{1};
+            disp('Trajectory finished')
             self.stop();
         end
-                
+        
         
         function abort(varargin)
-            self=varargin{1};            
+            self=varargin{1};
             self.aborted=1;
             self.stop();
         end
         
         function stop(varargin)
             self=varargin{1};
-                        
+            handles=guidata(self.hFig);
+            interface=handles.interface;
+            
             if self.aborted==1
                 handles=guidata(self.hFig);
                 handles.interface.stop()
-                                
+                
                 disp('Aborted by user')
                 self.aborted=0;
             end
             
+            interface.set_velocities(interface.default_velocities)
+            interface.joystickOn()
+            
             self.running=0;
-            self.moving=0;
+            %disp('Not running')
+            %self.moving=0;
             self.do_update=1;
         end
         
         function out=run_checks(varargin)
-             self=varargin{1};
-             out=[self.is_running() self.is_moving()];
-             if self.is_aborted()==1
-                 self.running=0; 
-             end
+            self=varargin{1};
+            out=[self.is_running() self.is_moving()];
+            if self.is_aborted()==1
+                self.running=0;
+            end
         end
         
         function check=is_running(varargin)
-             self=varargin{1};
-             check=self.running;
+            self=varargin{1};
+            check=self.running;
         end
         
         function check=is_moving(varargin)
-             self=varargin{1};
-             check=self.moving;
+            self=varargin{1};
+            check=self.moving;
         end
         
         function check=is_paused(varargin)
-             self=varargin{1};
-             check=self.paused;
+            self=varargin{1};
+            check=self.paused;
         end
         
         function check=is_aborted(varargin)
-             self=varargin{1};
-             check=self.aborted;
+            self=varargin{1};
+            check=self.aborted;
         end
         
         function check=is_finished(varargin)
-             self=varargin{1};
-             check=self.finished;
+            self=varargin{1};
+            check=self.finished;
         end
         
         %%% Clear last
@@ -282,5 +290,5 @@ classdef trajectory < handle
             self.do_update=1;
         end
         
-    end    
+    end
 end

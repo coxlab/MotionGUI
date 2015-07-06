@@ -5,6 +5,7 @@ global state
 
 H=varargin{1};
 handles=guidata(H);
+interface=handles.interface;
 
 switch 3
     case 1
@@ -82,8 +83,19 @@ switch 3
             T=handles.T_grid;
         end
         if T.running==0
+            %%% Make sure we start at the first coordinate in the list
             T.target_index=1;
-            T.target_coord=T.coords(T.target_index).coord;
+            
+            %%% Turn off joystick
+            interface.joystickOff()
+            pause(.1)
+            
+            %%% Go to initial coordinate at full speed
+            interface.setTarget(T.coords(T.target_index).coord)
+            interface.set_velocities(interface.max_velocities)
+            interface.go2target()
+            
+            %%% Go
             T.run()
         else
             T.abort()

@@ -208,18 +208,36 @@ try
             
             %%% Handle go2pos moves
             T=handles.T_go2pos;
-            %checks=T.run_checks();
-            if T.is_moving==1
-                interface.joystickOff()
-                interface.set_velocities(interface.max_velocities)
-                interface.mockMove() % only for detached mode
-                if interface.getDist()<interface.tolerance
-                    T.finish()
+            if T.is_running==1
+                if interface.motionDone()==1
+                    % we are not moving
+                    
+                    % are we at target?
+                    %interface.mockMove() % only for detached mode
+                    if interface.getDist()>interface.tolerance
+                        % no
+                        if interface.joystick==1 % initiate
+                            interface.joystickOff()
+                            pause(.1)
+                            disp('Setting coordinates')
+                            interface.go2target()                            
+                        end
+                    else % clean up
+                        % yes
+                        T.finish()
+                        %interface.set_velocities(interface.default_velocities)
+                        %interface.joystickOn()
+                    end
+                    
+                else
+                    % moving
+                    interface.mockMove() % only for detached mode
+                    %interface.getDist()
                 end
-                interface.set_velocities(interface.default_velocities)
-                interface.joystickOn()
             end
             
+            
+            %%% STACK / GRID
             if handles.stack_grid==1
                 %%% Handle zStack moves
                 T=handles.T_zStack;
@@ -227,45 +245,90 @@ try
                 %%% Handle zStack moves
                 T=handles.T_grid;
             end
-            if T.is_moving
-                interface.joystickOff()
-                interface.set_velocities(interface.max_velocities)
-                %interface.setVelocties(interface.max_velocities)
-                interface.mockMove() % only for detached mode
-                
-                if interface.getDist()<interface.tolerance
-                    if T.target_index<T.nCoords
-                        T.target_index=T.target_index+1;
-                        T.target_coord=T.coords(T.target_index).coord;
-                        interface.iStep=0;
-                        
-                        interface.target_coords=T.target_coord;
-                        
-                        interface.calc_velocities() % get velocities for each axis separately
-                        interface.set_velocities(interface.track_velocities)
-                    else
-                        T.finish()
+            handles.ccd2p=1;
+            %handles.ccd2p
+            switch 1
+                case 1     
+                    %[T.is_running interface.motionDone() interface.getDist()>interface.tolerance interface.joystick]
+                    if T.is_running==1                        
+                        if interface.motionDone()==1
+                            % we are not moving
+                            
+                            % are we at target?                                                        
+                            if interface.getDist()>interface.tolerance
+                                % no 
+                                %interface.joystick                                                                
+                            else % clean up
+                                % yes
+                                if T.target_index==T.nCoords
+                                    disp('no more coordinates')
+                                    T.finish()
+                                else % advance to next position
+                                    
+                                    %%% execute arbitrary function
+                                    if handles.ccd2p==1
+                                        % take picture
+                                        
+                                    else
+                                    end
+                                    
+                                    %disp('what now?')
+                                    T.target_index=T.target_index+1;
+                                    T.target_coord=T.coords(T.target_index).coord;
+                                    interface.iStep=0;
+                                    %interface.target_coords=T.target_coord;
+                                    
+                                    disp('Setting coordinates')
+                                    interface.setTarget(T.target_coord)
+                                    
+                                    if handles.ccd2p==2
+                                        upstroke=T.target_coord(3)==T.coords(1).coord(3);
+                                        if upstroke==0
+                                            interface.track_speed=.05;
+                                            interface.calc_velocities() % get velocities for each axis separately
+                                            interface.set_velocities(interface.track_velocities)
+                                        else % given a 3D grid, we move back to the surface at max speed
+                                            interface.set_velocities(interface.max_velocities)
+                                        end
+                                    else % in 2D grid, move fast all the time
+                                        interface.set_velocities(interface.max_velocities)
+                                    end
+                                    %%% Move!
+                                    interface.go2target()
+                                end
+                            end
+                        else
+                            % moving
+                            interface.mockMove() % only for detached mode
+                        end
                     end
-                end
-                interface.set_velocities(interface.default_velocities)
-                interface.joystickOn()
+                    
+                case 2
+                    if T.is_moving
+                        interface.joystickOff()
+                        interface.set_velocities(interface.max_velocities)
+                        %interface.setVelocties(interface.max_velocities)
+                        interface.mockMove() % only for detached mode
+                        
+                        if interface.getDist()<interface.tolerance
+                            if T.target_index<T.nCoords
+                                T.target_index=T.target_index+1;
+                                T.target_coord=T.coords(T.target_index).coord;
+                                interface.iStep=0;
+                                
+                                interface.target_coords=T.target_coord;
+                                
+                                interface.calc_velocities() % get velocities for each axis separately
+                                interface.set_velocities(interface.track_velocities)
+                            else
+                                T.finish()
+                            end
+                        end
+                        interface.set_velocities(interface.default_velocities)
+                        pause(1)
+                        interface.joystickOn()
+                    end
             end
-            
-            
-            
-            %             if T.is_aborted()==1
-            %                 %disp('abort!')
-            %                 %interface.stop()
-            %                 T.aborted=0;
-            %                 T.finished=1;
-            %             end
-            
-            %             if T.is_finished()
-            %                 T.running=0;
-            %                 T.moving=0;
-            %                 T.do_update()
-            %             end
-            
     end
     handles.Trajectory=Trajectory;
 catch
@@ -274,6 +337,9 @@ catch
     disp(A.message)
 end
 
+interface.getStatus();
+%interface.joystickOn()
+%interface.getErrorMsg()
 
 update_gui(H)
 guidata(H,handles)
