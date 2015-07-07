@@ -208,13 +208,13 @@ try
             
             %[T.is_running interface.motionDone() interface.getDist()>interface.tolerance interface.joystick]
             %[T.is_running interface.is_moving interface.getDist()>interface.tolerance interface.joystick]
-            
+                        
             if T.is_running==1
                 if interface.motionDone()==1
                     % we are not moving
                     
                     % are we at target?
-                    %interface.mockMove() % only for detached mode
+                    %interface.mockMove() % only for detached mode                    
                     if interface.getDist()>interface.tolerance
                         % no
                         if interface.joystick==1 % initiate
@@ -282,9 +282,15 @@ try
                                     else
                                         for vid_nr=1:2
                                             im=getsnapshot(handles.(sprintf('ccd%02d',vid_nr)));
+                                            im=rot90(rot90(im));
                                             saveFolder='temp';
-                                            saveName=fullfile(saveFolder.sprintf('epi_%02d_%03d.png',[vid_nr T.target_index]))
-                                            %imwrite(im,saveName)
+                                            saveName=fullfile(saveFolder,sprintf('ccd_%02d_%03d.png',[vid_nr T.target_index]));
+                                            savec(saveName)
+                                            imwrite(im,saveName)
+                                            C_abs=cat(1,T.coords.coord);
+                                            C_rel=interface.abs2rel(C_abs);
+                                            dlmwrite(fullfile(saveFolder,'abs_coords.txt'),C_abs,'delimiter',';','newline','pc')
+                                            dlmwrite(fullfile(saveFolder,'rel_coords.txt'),C_rel,'delimiter',';','newline','pc')
                                             if 0
                                                 figure(1)
                                                 subplot(1,2,vid_nr)
@@ -299,6 +305,8 @@ try
                                     % pause when scim file is getting to
                                     % big...
                                     nFrames=1500;
+                                    % check if scanimage is still recording
+                                    % and pause if not
                                 end
                                 
                                 if T.target_index==T.nCoords
