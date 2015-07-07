@@ -80,33 +80,6 @@ handles.Calibration=Calibration;
 %handles.Trajectory=Trajectory;
 handles.coords=[0 0 0];
 
-%%% Add video capture capabilities
-if ismac
-    handles.ccd01=[];
-    handles.ccd02=[];
-else
-    highres=0;
-    if highres==0
-        %vid = videoinput('winvideo', 1, 'Y800_1280x960');
-        vid = videoinput('winvideo', 2, 'Y16 _1024x768');
-    else
-        vid = videoinput('winvideo', 2, 'Y16 _2592x1944');
-    end
-    %src = getselectedsource(vid);
-    handles.ccd01=vid;
-    
-    if highres==0
-        %vid = videoinput('winvideo', 1, 'Y800_1280x960');
-        vid = videoinput('winvideo', 3, 'Y16 _1024x768');
-    else
-        vid = videoinput('winvideo', 3, 'Y16 _2592x1944');
-    end
-    %src = getselectedsource(vid);
-    handles.ccd02=vid;
-end
-
-
-
 
 %%% Create timer
 hTimer=timer('Name','TrajectoryTimer','Period',timerPeriod,'ExecutionMode','FixedSpacing','TimerFcn',@timerFcn,'userdata',handles);
