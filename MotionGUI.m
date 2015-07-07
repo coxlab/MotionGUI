@@ -70,33 +70,40 @@ coordinate_system.center_coords=coordinate_system.rect([3 4])/2;
 headplate=struct('calibrated',1,'center_coords',[9.4639 7.1563],'radius',12/2);
 window_reset=struct('calibrated',0,'coords',zeros(5,3),'Z_offset',0,'coords_collected',zeros(5,1),'show_AP',0,'show_ML',0);
 
+
+calibration_folder=fullfile(path_dir,'calibrations');
 Calibration=struct('coordinate_system',coordinate_system,'headplate',headplate,'window',window_reset,'window_reset',window_reset);
 %Trajectory=struct('coords_matrix',[],'nCoords',0,'target_coord',0,'target_index',0,'velocity',0,'running',0);
 
-handles=struct('hFig',hFig,'hPanel_axis',hPanel_axis,'comport',comport,'coords',[0 0 0],'mode',0,'velocity',[],'nSteps',0,'dwell_time',1,'s',[],'current_config',0,'ccd2p',0);
+handles=struct('hFig',hFig,'hPanel_axis',hPanel_axis,'comport',comport,'coords',[0 0 0],'mode',0,'velocity',[],'nSteps',0,'dwell_time',1,'s',[],'current_config',0,'ccd2p',0,'calibration_folder',calibration_folder);
 handles.Calibration=Calibration;
 %handles.Trajectory=Trajectory;
 handles.coords=[0 0 0];
 
 %%% Add video capture capabilities
-highres=0;
-if highres==0
-    %vid = videoinput('winvideo', 1, 'Y800_1280x960');
-    vid = videoinput('winvideo', 2, 'Y16 _1024x768');
+if ismac
+    handles.ccd01=[];
+    handles.ccd02=[];
 else
-    vid = videoinput('winvideo', 2, 'Y16 _2592x1944');
+    highres=0;
+    if highres==0
+        %vid = videoinput('winvideo', 1, 'Y800_1280x960');
+        vid = videoinput('winvideo', 2, 'Y16 _1024x768');
+    else
+        vid = videoinput('winvideo', 2, 'Y16 _2592x1944');
+    end
+    %src = getselectedsource(vid);
+    handles.ccd01=vid;
+    
+    if highres==0
+        %vid = videoinput('winvideo', 1, 'Y800_1280x960');
+        vid = videoinput('winvideo', 3, 'Y16 _1024x768');
+    else
+        vid = videoinput('winvideo', 3, 'Y16 _2592x1944');
+    end
+    %src = getselectedsource(vid);
+    handles.ccd02=vid;
 end
-%src = getselectedsource(vid);
-handles.ccd01=vid;
-
-if highres==0
-    %vid = videoinput('winvideo', 1, 'Y800_1280x960');
-    vid = videoinput('winvideo', 3, 'Y16 _1024x768');
-else
-    vid = videoinput('winvideo', 3, 'Y16 _2592x1944');
-end
-%src = getselectedsource(vid);
-handles.ccd02=vid;
 
 
 

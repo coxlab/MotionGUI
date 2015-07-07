@@ -72,13 +72,10 @@ try
     %[handles.coords;coords]
     %%% Update position on gui
     if interface.update_position==1
-        
         handles.coords=coords;
         if isfield(state,'init')
             state.init.xyz.coords=coords;
         end
-        
-        
     end
     
     %Trajectory
@@ -208,6 +205,10 @@ try
             
             %%% Handle go2pos moves
             T=handles.T_go2pos;
+            
+            %[T.is_running interface.motionDone() interface.getDist()>interface.tolerance interface.joystick]
+            %[T.is_running interface.is_moving interface.getDist()>interface.tolerance interface.joystick]
+            
             if T.is_running==1
                 if interface.motionDone()==1
                     % we are not moving
@@ -221,10 +222,14 @@ try
                             pause(.1)
                             disp('Setting coordinates')
                             interface.go2target()                            
+                            
+                            interface.is_moving=1;
                         end
                     else % clean up
                         % yes
+                        
                         T.finish()
+                        %interface.is_moving=0;
                         %interface.set_velocities(interface.default_velocities)
                         %interface.joystickOn()
                     end
@@ -232,8 +237,9 @@ try
                 else
                     % moving
                     interface.mockMove() % only for detached mode
-                    %interface.getDist()
                 end
+            else
+                %disp('why here')
             end
             
             
@@ -246,28 +252,53 @@ try
                 T=handles.T_grid;
             end
             handles.ccd2p=1;
+            
             %handles.ccd2p
             switch 1
-                case 1     
+                case 1
                     %[T.is_running interface.motionDone() interface.getDist()>interface.tolerance interface.joystick]
+                    %[T.is_running interface.is_moving interface.getDist()>interface.tolerance interface.joystick]
+                    
+                    %interface.is_moving=0;
+                    %T.is_running
+                    
                     if T.is_running==1                        
-                        if interface.motionDone()==1
+                        if interface.motionDone()==1                            
                             % we are not moving
-                            
-                            % are we at target?                                                        
+
+                            % are we at target?
                             if interface.getDist()>interface.tolerance
-                                % no 
-                                %interface.joystick                                                                
-                            else % clean up                                                               
+                                % no
+                                %interface.joystick   
+                                interface.is_moving=1;
+                                %interface.motionDone()
+                            else % clean up
                                 % yes
                                 %%% execute arbitrary function
                                 if handles.ccd2p==1
                                     % take picture
-                                    disp('taking picture')
-                                    im=getsnapshot(handles.ccd01);
-                                    figure(1)
-                                    imshow(im,[])
+                                    if isempty(handles.ccd01)
+                                        fprintf('Taking picture #%03d\n',T.target_index)
+                                    else
+                                        for vid_nr=1:2
+                                            im=getsnapshot(handles.(sprintf('ccd%02d',vid_nr)));
+                                            saveFolder='temp';
+                                            saveName=fullfile(saveFolder.sprintf('epi_%02d_%03d.png',[vid_nr T.target_index]))
+                                            %imwrite(im,saveName)
+                                            if 0
+                                                figure(1)
+                                                subplot(1,2,vid_nr)
+                                                imshow(im,[])
+                                                title(T.target_index)
+                                            end
+                                        end
+                                    end
                                 else
+                                    % recording scim file, no need to take
+                                    % special action, unless we want to
+                                    % pause when scim file is getting to
+                                    % big...
+                                    nFrames=1500;
                                 end
                                 
                                 if T.target_index==T.nCoords
@@ -281,8 +312,9 @@ try
                                     interface.iStep=0;
                                     %interface.target_coords=T.target_coord;
                                     
-                                    disp('Setting coordinates')
+                                    %disp('Setting coordinates')
                                     interface.setTarget(T.target_coord)
+                                    interface.is_moving=1;
                                     
                                     if handles.ccd2p==2
                                         upstroke=T.target_coord(3)==T.coords(1).coord(3);
@@ -296,6 +328,7 @@ try
                                     else % in 2D grid, move fast all the time
                                         interface.set_velocities(interface.max_velocities)
                                     end
+                                    
                                     %%% Move!
                                     interface.go2target()
                                 end

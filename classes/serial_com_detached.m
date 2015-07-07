@@ -3,6 +3,7 @@ classdef serial_com_detached < handle
     properties
         name='';
         s=[];
+        status=[];
         connected=0;
         conn_str='';
         deconn_str='';
@@ -13,6 +14,7 @@ classdef serial_com_detached < handle
         track_velocities=[]; % placeholder for calculated coords
         track_speed=[];
         cur_velocities=[]; % used for current/next move
+        is_moving=[];
         
         joystick=0;
         
@@ -20,8 +22,9 @@ classdef serial_com_detached < handle
         last_coords=[];
         target_coords=[];
         distance=[];
-        tolerance=1e-7;
+        tolerance=1e-5;
         update_position=1;
+        
         iStep=[];
         nStep=[];
         do_update=0;
@@ -50,10 +53,12 @@ classdef serial_com_detached < handle
             self=varargin{1};
             
             self.getPos();
+            self.status=0;
             self.target_coords=[0 0 0];
             self.track_speed=.1;
             self.connected=1;
             self.do_update=1;
+            self.is_moving=0;
         end
         
         %%% Get position
@@ -68,7 +73,13 @@ classdef serial_com_detached < handle
             %%% Hacky way of getting to current actual stage positions,
             %%% read it from the GUI since we have no access to the ESP301
             %%% motion controller.
-            self.cur_coords=[get(h_xy,'Xdata') get(h_xy,'Ydata') get(h_z,'Ydata')];
+            window=handles.Calibration.window;
+            coords=[get(h_xy,'Xdata') get(h_xy,'Ydata') get(h_z,'Ydata')];
+            %if window.calibrated==1
+            %    self.cur_coords=coords+[window.center_coords*0 window.Z_offset];
+            %else
+                self.cur_coords=coords;
+            %end
             
             %%% Only update position on GUI once
             self.distance=self.getDistMoved();
@@ -114,14 +125,19 @@ classdef serial_com_detached < handle
         
         
         %%% Set position
-        function setPos(varargin)
+        function setTarget(varargin)
             self=varargin{1};
             if nargin>=2
                 self.target_coords=varargin{2};    
-            end
+            end            
+        end
+        
+        function go2target(varargin)
+            self=varargin{1};
             self.iStep=0;
             self.nStep=20;
         end
+        
         
         function d=getDistMoved(varargin)
             self=varargin{1};
@@ -154,6 +170,11 @@ classdef serial_com_detached < handle
             set(h_z,'Ydata',self.cur_coords(3)+distance_vector(3));
             
             self.iStep=self.iStep+1;
+            
+            if self.getDist()<self.tolerance
+                self.is_moving=0;
+            end
+            %self.iStep
         end
         
         %%% STOP
@@ -164,6 +185,22 @@ classdef serial_com_detached < handle
             %msg='ST';
             %self.send(msg);
         end
+        
+        function done=motionDone(varargin)
+            self=varargin{1};
+            if self.is_moving==0
+                done=1;
+            else
+                done=0;
+            end
+        end
+        
+        function status=getStatus(varargin)
+            self=varargin{1};
+            status=[0 0 0 0 1 0 1 0];
+            self.status=status;
+        end
+        
     end
     
 end

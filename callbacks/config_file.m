@@ -4,8 +4,8 @@ handles=guidata(varargin{1});
 mode=varargin{3};
 
 current_folder=pwd;
-calibration_folder='C:\Users\labuser\Documents\ben\Matlab\GUIs\MotionGUI\Calibrations';
-cd(calibration_folder)
+%calibration_folder='C:\Users\labuser\Documents\ben\Matlab\GUIs\MotionGUI\Calibrations';
+cd(handles.calibration_folder)
 switch lower(mode)
     case 'save'
         [filename, pathname]=uiputfile('*.mat','Save your settings');

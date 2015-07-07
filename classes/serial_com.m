@@ -18,6 +18,7 @@ classdef serial_com < handle
         track_speed=[];
         cur_velocities=[]; % used for current/next move
         stages_moving=[];
+        is_moving=[]; % dummy variable to make code run, not used in real version of the code
         
         joystick=0;
         cur_coords=[];
@@ -89,30 +90,6 @@ classdef serial_com < handle
                str='';
            end
         end
-        
-        %%% Joystick
-%         function toggleJoystick(varargin)
-%             self=varargin{1};
-%             target_state=varargin{2};
-%             switch target_state
-%                 case 'ON'
-%                     msg='EX JOYSTICK ON';
-%                     cur_state=1;
-%                 case 'OFF'
-%                     msg='EX JOYSTICK OFF';
-%                     cur_state=0;
-%                 case 'TOGGLE'
-%                     if self.joystick==0
-%                         msg='EX JOYSTICK ON';
-%                         cur_state=1;
-%                     else
-%                         msg='EX JOYSTICK OFF';
-%                         cur_state=0;
-%                     end
-%             end
-%             self.send(msg)
-%             self.joystick=cur_state;
-%         end
         
         function joystickOn(varargin)
             self=varargin{1};

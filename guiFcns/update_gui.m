@@ -12,13 +12,23 @@ handles=guidata(H);
 %%% Serial interface
 interface=handles.interface;
 if interface.do_update==1    
-    if interface.update_position==1
-        plot_coords=interface.cur_coords;
+    if interface.update_position==1        
+        Calibration=handles.Calibration;
+        if Calibration.window.calibrated==1
+            window=Calibration.window;
+            plot_coords=interface.cur_coords;
+            %plot_coords(3)=plot_coords(3)-window.Z_offset;
+            disp_coords=interface.cur_coords-[window.center_coords window.Z_offset]
+        else
+            plot_coords=interface.cur_coords;
+            disp_coords=interface.cur_coords;
+        end        
+        
         set(handles.plot_handles(1).p(6).h,'Xdata',plot_coords(1),'Ydata',plot_coords(2))
         set(handles.plot_handles(2).p(1),'Ydata',plot_coords(3))
-        set(handles.plot_handles(2).p(2),'String',sprintf('%3.4f',plot_coords(3)))
+        set(handles.plot_handles(2).p(2),'String',sprintf('%3.4f',disp_coords(3)))
         
-        string=sprintf('X=%03.4f ; Y=%03.4f ; Z=%03.4f',plot_coords);
+        string=sprintf('X=%03.4f ; Y=%03.4f ; Z=%03.4f',disp_coords);
         set(handles.hEdit02,'String',string)
         
         % Reset flag
