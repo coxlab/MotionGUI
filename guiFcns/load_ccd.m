@@ -22,7 +22,7 @@ else
     %get(vid)        
     src = getselectedsource(vid);
     src.ExposureMode='manual';
-    src.Exposure=-4;
+    src.Exposure=-2;
     src.GainMode='manual';
     src.Gain=4;
     
