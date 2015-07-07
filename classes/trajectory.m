@@ -95,35 +95,41 @@ classdef trajectory < handle
             else
                 disp('Creating 2D grid')
                 M=cat(1,T_zStack.coords.coord);
-                FOV_size=[700 900]/1000;
-                overlap_factor=.80;
-                
-                
-                V=FOV_size(1)*overlap_factor;
-                H=FOV_size(2)*overlap_factor;
-                D=abs(diff(M));
-                nRows=ceil(D(2)/V);
-                nCols=ceil(D(1)/H);
-                X=linspace(M(1,1),M(2,1),nCols);
-                Y=linspace(M(1,2),M(2,2),nRows);
-                Z=repmat(linspace(M(1,3),M(2,3),nRows),nCols,1);
-                G_z=Z(:);
-                [G_x,G_y]=meshgrid(X,Y);
-                G_x=G_x';
-                G_y=G_y';
-                %abs([mean(diff(X)) mean(diff(Y))])
-                if shape==1
-                    mask=true(size(G_x));
-                elseif shape==2 % circle
-                    x=G_x-mean(G_x(:));
-                    y=G_y-mean(G_y(:));
-                    dist=sqrt(x.^2+y.^2);
-                    mask=dist<max([max(x(:)) max(y(:))]);
-                    mask=mask(:)==1;
+                if size(M,1)==2                    
+                    FOV_size=[710 946]/1000;
+                    overlap_factor=.80;
+                    
+                    V=FOV_size(1)*overlap_factor;
+                    H=FOV_size(2)*overlap_factor;
+                    D=abs(diff(M));                    
+                    nRows=max([1 ceil(D(2)/V)]);
+                    nCols=max([1 ceil(D(1)/H)]);
+                    X=linspace(M(1,1),M(2,1),nCols);
+                    Y=linspace(M(1,2),M(2,2),nRows);
+                    % tilt in AP direction
+                    %Z=repmat(linspace(M(1,3),M(2,3),nRows),nCols,1);
+                    % tilt in ML direction
+                    Z=repmat(linspace(M(1,3),M(2,3),nCols),1,nRows);
+                    G_z=Z(:);
+                    [G_x,G_y]=meshgrid(X,Y);
+                    G_x=G_x';
+                    G_y=G_y';
+                    %abs([mean(diff(X)) mean(diff(Y))])
+                    if shape==1
+                        mask=true(size(G_x));
+                    elseif shape==2 % circle
+                        x=G_x-mean(G_x(:));
+                        y=G_y-mean(G_y(:));
+                        dist=sqrt(x.^2+y.^2);
+                        mask=dist<max([max(x(:)) max(y(:))]);
+                        mask=mask(:)==1;
+                    end
+                    %output=[G_x(:) G_y(:) G_x(:)*0+M(1,3) G_x(:)*0];                    
+                    output=[G_x(mask) G_y(mask) G_z(mask) G_x(mask)*0];
+                    self.batch_add(output);
+                else
+                    disp('Makegrid needs exactly 2 coordinates...')
                 end
-                %output=[G_x(:) G_y(:) G_x(:)*0+M(1,3) G_x(:)*0];
-                output=[G_x(mask) G_y(mask) G_z(mask) G_x(mask)*0];
-                self.batch_add(output);
             end
         end
         
