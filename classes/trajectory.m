@@ -106,10 +106,14 @@ classdef trajectory < handle
                     nCols=max([1 ceil(D(1)/H)]);
                     X=linspace(M(1,1),M(2,1),nCols);
                     Y=linspace(M(1,2),M(2,2),nRows);
+                    
+                    %%% this part needs to be modified into a continuous
+                    %%% version. taking window tilt and pitch into account.
+                    %%% For now, it is AP or ML, not grey area
                     % tilt in AP direction
-                    %Z=repmat(linspace(M(1,3),M(2,3),nRows),nCols,1);
+                    Z=repmat(linspace(M(1,3),M(2,3),nRows),nCols,1);
                     % tilt in ML direction
-                    Z=repmat(linspace(M(1,3),M(2,3),nCols),1,nRows);
+                    %Z=repmat(linspace(M(1,3),M(2,3),nCols),1,nRows);
                     G_z=Z(:);
                     [G_x,G_y]=meshgrid(X,Y);
                     G_x=G_x';
