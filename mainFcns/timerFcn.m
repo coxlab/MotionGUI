@@ -275,7 +275,7 @@ try
                             else % clean up
                                 % yes
                                 %%% execute arbitrary function
-                                if handles.ccd2p==1
+                                if handles.ccd2p==1&&handles.stack_grid==2
                                     % take picture
                                     if isempty(handles.ccd01)
                                         fprintf('Taking picture #%03d\n',T.target_index)
