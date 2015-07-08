@@ -1,9 +1,8 @@
 function setWindowCoord(varargin)
 handles=guidata(varargin{1});
 mode=varargin{3};
-s=handles.s;
-
-cur_pos=getMotorPosition(s);
+interface=handles.interface;
+cur_pos=interface.cur_coords;
 
 Calibration=handles.Calibration;
 
