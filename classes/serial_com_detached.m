@@ -21,6 +21,9 @@ classdef serial_com_detached < handle
         cur_coords=[];
         last_coords=[];
         target_coords=[];
+        plot_coords=[];
+        disp_coords=[];
+        
         distance=[];
         tolerance=1e-5;
         update_position=1;
@@ -55,6 +58,9 @@ classdef serial_com_detached < handle
             self.getPos();
             self.status=0;
             self.target_coords=[0 0 0];
+            self.plot_coords=self.cur_coords;
+            self.disp_coords=self.cur_coords;
+        
             self.track_speed=.1;
             self.connected=1;
             self.do_update=1;
@@ -87,6 +93,45 @@ classdef serial_com_detached < handle
                 self.update_position=1;
                 self.do_update=1;
                 self.last_coords=self.cur_coords;
+            end
+        end
+        
+        function correctCoords(varargin)
+            self=varargin{1};
+            handles=guidata(self.H);
+            window=handles.Calibration.window;
+            if window.calibrated==1
+                self.plot_coords=self.cur_coords-[0 0 window.Z_offset];
+                self.disp_coords=self.cur_coords-[window.center_coords window.Z_offset];
+            else
+                self.plot_coords=self.cur_coords;
+                self.disp_coords=self.cur_coords;
+            end
+        end
+        
+        function coords=rel2abs(varargin)
+            self=varargin{1};
+            coords_read=varargin{2};
+            handles=guidata(self.H);
+            window=handles.Calibration.window;
+            if window.calibrated==1
+                N=size(coords_read,1);
+                coords=coords_read+repmat([window.center_coords window.Z_offset],N,1);
+            else
+                coords=coords_read;
+            end
+        end
+        
+        function coords=abs2rel(varargin)
+            self=varargin{1};
+            coords_read=varargin{2};
+            handles=guidata(self.H);
+            window=handles.Calibration.window;
+            if window.calibrated==1
+                N=size(coords_read,1);
+                coords=coords_read-repmat([window.center_coords window.Z_offset],N,1);
+            else
+                coords=coords_read;
             end
         end
         
