@@ -95,23 +95,42 @@ classdef trajectory < handle
             else
                 disp('Creating 2D grid')
                 M=cat(1,T_zStack.coords.coord);
-                if size(M,1)==2                    
+                if size(M,1)==2        
+                    self.clear()
                     FOV_size=[710 946]/1000;
                     overlap_factor=.80;
                     
                     V=FOV_size(1)*overlap_factor;
-                    H=FOV_size(2)*overlap_factor;
+                    H=FOV_size(2)*overlap_factor;                    
                     D=abs(diff(M));                    
-                    nRows=max([1 ceil(D(2)/V)]);
-                    nCols=max([1 ceil(D(1)/H)]);
-                    X=linspace(M(1,1),M(2,1),nCols);
-                    Y=linspace(M(1,2),M(2,2),nRows);
+                    nRows=max([1 ceil(D(2)/H)]);
+                    nCols=max([1 ceil(D(1)/V)]);
+                    
+                    x0=min(M(:,1));
+                    y0=max(M(:,2));
+                                        
+                    switch 4
+                        case 1
+                            X=linspace(M(1,1),M(1,1)+V*nRows,nCols);
+                            Y=linspace(M(1,2),M(1,2)+H*nCols,nRows);
+                        case 2
+                            X=linspace(M(1,1),M(2,1),nCols);
+                            Y=linspace(M(1,2),M(2,2),nRows);
+                        case 3
+                            X=M(1,1):V:M(1,1)+V*(nRows-1);
+                            Y=M(1,2):H:M(1,2)+H*(nCols-1);
+                        case 4                            
+                            X=x0:V:x0+V*(nCols-1);
+                            Y=y0:-H:y0-H*(nRows);
+                    end
+                    
+                    %abs([mean(diff(X(:))) mean(diff(Y(:)))])
                     
                     %%% this part needs to be modified into a continuous
                     %%% version. taking window tilt and pitch into account.
                     %%% For now, it is AP or ML, not grey area
                     % tilt in AP direction
-                    Z=repmat(linspace(M(1,3),M(2,3),nRows),nCols,1);
+                    Z=repmat(linspace(M(1,3),M(2,3),length(X)),length(Y),1);
                     % tilt in ML direction
                     %Z=repmat(linspace(M(1,3),M(2,3),nCols),1,nRows);
                     G_z=Z(:);
