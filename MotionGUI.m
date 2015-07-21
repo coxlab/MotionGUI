@@ -131,11 +131,15 @@ hBut15=uicontrol(hPanel_buttons,'Style','Pushbutton','String','Joystick','Units'
 hBut16=uicontrol(hPanel_buttons,'Style','Pushbutton','String','Vel','Units','Normalized','Position',[button_init+5*button_spacing_left button_init-1*button_spacing_up button_width/2 button_height],'Callback',@changeVelocities);
 
 %% add button to axis panel
-modality = uibuttongroup(hPanel_axis,'Visible','off','Units','Normalized','Position',[.01 .9 .3 .08]);%,'SelectionChangedFcn',@toggle_ccd2p);
-r1 = uicontrol(modality,'Style','radiobutton','String','CCD','Units','Normalized','Position',[.1 .1 .5 .5],'HandleVisibility','off');
-r2 = uicontrol(modality,'Style','radiobutton','String','2p','Units','Normalized','Position',[.5 .1 .5 .5],'HandleVisibility','off');
-modality.Visible = 'on';
-%uicontrol(hPanel_axis,'Style','togglebutton','String','CCD/2p','Units','Normalized','Position',[0 .95 .15 .05 ],'Callback',@toggleCCD2p);
+if ismac
+    modality = uibuttongroup(hPanel_axis,'Visible','off','Units','Normalized','Position',[.01 .9 .3 .08],'SelectionChangedFcn',@toggle_ccd2p);
+    r1 = uicontrol(modality,'Style','radiobutton','String','CCD','Units','Normalized','Position',[.1 .1 .5 .5],'HandleVisibility','off');
+    r2 = uicontrol(modality,'Style','radiobutton','String','2p','Units','Normalized','Position',[.5 .1 .5 .5],'HandleVisibility','off');
+    modality.Visible = 'on';
+else
+    uicontrol(hPanel_axis,'Style','togglebutton','String','CCD/2p','Units','Normalized','Position',[0 .95 .15 .05 ],'Callback',@toggleCCD2p);
+end
+
 
 handles.stack_grid=1;
 handles.T_go2pos=trajectory('nextPos',hFig,handles.hEdit03,handles.goButton);

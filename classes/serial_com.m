@@ -15,6 +15,7 @@ classdef serial_com < handle
         max_velocities=[]; % max possible
         default_velocities=[]; % nice average
         track_velocities=[]; % placeholder for calculated coords
+        track_time=[];
         track_speed=[];
         cur_velocities=[]; % used for current/next move
         stages_moving=[];
@@ -218,8 +219,10 @@ classdef serial_com < handle
             self=varargin{1};
             distances=diff([self.cur_coords;self.target_coords]);            
             if any(distances)
-                self.track_velocities=abs(distances./self.getDist()*self.track_speed);
+                self.track_time=self.getDist()/self.track_speed;                                
+                self.track_velocities=abs(distances./self.getDist()*self.track_speed);                
             end                        
+            
             %self.track_velocities
         end
         

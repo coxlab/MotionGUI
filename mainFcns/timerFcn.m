@@ -52,7 +52,7 @@ try
     if ~isempty(state) && isfield(state,'init') && ~isfield(state.init,'xyz')
         state.init.xyz.coords=coords;
         disp('coords sent to scanimage')
-    end
+    end        
     
     %BV20150304 show z-bar in red when objective is not where it is
     %supposed to be
@@ -251,7 +251,7 @@ try
                 %%% Handle zStack moves
                 T=handles.T_grid;
             end
-            handles.ccd2p=1;
+            %handles.ccd2p=1;
             
             %handles.ccd2p
             switch 1
@@ -307,11 +307,14 @@ try
                                     nFrames=1500;
                                     % check if scanimage is still recording
                                     % and pause if not
+                                    
+                                    % maybe just linger
                                 end
-                                
+                                                                
                                 if T.target_index==T.nCoords
                                     disp('no more coordinates')
                                     T.finish()
+                                    toc
                                 else % advance to next position                                                                        
                                     
                                     %disp('what now?')
@@ -323,12 +326,13 @@ try
                                     %disp('Setting coordinates')
                                     interface.setTarget(T.target_coord)
                                     interface.is_moving=1;
-                                    
-                                    if handles.ccd2p==2
+                                                                           
+                                    if handles.ccd2p==2 % make sure toggle switch is engaged
                                         upstroke=T.target_coord(3)==T.coords(1).coord(3);
-                                        if upstroke==0
-                                            interface.track_speed=.05;
-                                            interface.calc_velocities() % get velocities for each axis separately
+                                        if upstroke==0                                           
+                                            interface.track_speed=.01; % change this manually to get a good sampling of the stack
+                                            interface.calc_velocities() % get velocities for each axis separately                                            
+                                            fprintf('ETA: ~%3.2f seconds.\n',interface.track_time)
                                             interface.set_velocities(interface.track_velocities)
                                         else % given a 3D grid, we move back to the surface at max speed
                                             interface.set_velocities(interface.max_velocities)
@@ -339,6 +343,7 @@ try
                                     
                                     %%% Move!
                                     interface.go2target()
+                                    tic
                                 end
                             end
                         else
