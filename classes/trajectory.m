@@ -182,6 +182,8 @@ classdef trajectory < handle
                 X=linspace(M(1,1),M(2,1),nCols);
                 Y=linspace(M(1,2),M(2,2),nRows);
                 [G_x,G_y]=meshgrid(X,Y);
+                G_x=G_x';
+                G_y=G_y';
                 G_x=G_x(:);
                 G_y=G_y(:);
                 

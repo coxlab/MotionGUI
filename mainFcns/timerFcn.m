@@ -330,7 +330,7 @@ try
                                     if handles.ccd2p==2 % make sure toggle switch is engaged
                                         upstroke=T.target_coord(3)==T.coords(1).coord(3);
                                         if upstroke==0                                           
-                                            interface.track_speed=.05; % change this manually to get a good sampling of the stack
+                                            interface.track_speed=.003; % change this manually to get a good sampling of the stack
                                             interface.calc_velocities() % get velocities for each axis separately                                            
                                             fprintf('ETA: ~%3.2f seconds.\n',interface.track_time)
                                             interface.set_velocities(interface.track_velocities)
@@ -359,16 +359,29 @@ try
                                 laser_values=cat(1,T.coords.laser_power);
                                 nSteps=100;
                                 X=linspace(z_values(1),z_values(2),nSteps);
-                                switch 1
+                                switch 2
                                     case 1 % linear relation
                                         Y=linspace(laser_values(1),laser_values(2),nSteps);
                                     case 2
                                         Y=linspace(laser_values(1),laser_values(2),nSteps);
-                                        
+                                        coef=3;
+                                        Y_powerlaw=power(Y,coef);                                        
+                                        Y_powerlaw=Y_powerlaw-min(Y_powerlaw);
+                                        Y_powerlaw=Y_powerlaw/max(Y_powerlaw);
+                                        Y_powerlaw=Y_powerlaw*range(Y)+min(Y);
+                                        Y=Y_powerlaw;
+                                        if 0
+                                            figure(95)
+                                            Y2=linspace(laser_values(1),laser_values(2),nSteps);
+                                            plot(X,Y)
+                                            hold on
+                                            plot(X,Y2,'r')
+                                            hold off
+                                        end
                                 end
                                 
                                 z=interface.cur_coords(3);
-                                laser_power=round(Y(find(z<X,1,'first')));
+                                laser_power=round(Y(find(z<X,1,'first')));                                
                                 Remote_adjust_laser_power(laser_power)
                             end
                         end
