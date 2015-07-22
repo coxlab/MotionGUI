@@ -330,7 +330,7 @@ try
                                     if handles.ccd2p==2 % make sure toggle switch is engaged
                                         upstroke=T.target_coord(3)==T.coords(1).coord(3);
                                         if upstroke==0                                           
-                                            interface.track_speed=.01; % change this manually to get a good sampling of the stack
+                                            interface.track_speed=.05; % change this manually to get a good sampling of the stack
                                             interface.calc_velocities() % get velocities for each axis separately                                            
                                             fprintf('ETA: ~%3.2f seconds.\n',interface.track_time)
                                             interface.set_velocities(interface.track_velocities)
@@ -349,6 +349,28 @@ try
                         else
                             % moving
                             interface.mockMove() % only for detached mode
+                            
+                            auto_laser_power=1;
+                            if auto_laser_power==1
+                                % check progression along path and change power
+                                % levels accordingly
+                                M=cat(1,T.coords.coord);
+                                z_values=M(:,3);                                
+                                laser_values=cat(1,T.coords.laser_power);
+                                nSteps=100;
+                                X=linspace(z_values(1),z_values(2),nSteps);
+                                switch 1
+                                    case 1 % linear relation
+                                        Y=linspace(laser_values(1),laser_values(2),nSteps);
+                                    case 2
+                                        Y=linspace(laser_values(1),laser_values(2),nSteps);
+                                        
+                                end
+                                
+                                z=interface.cur_coords(3);
+                                laser_power=round(Y(find(z<X,1,'first')));
+                                Remote_adjust_laser_power(laser_power)
+                            end
                         end
                     end
                     
@@ -385,6 +407,7 @@ catch
     A=lasterror;
     disp(A.message)
 end
+
 
 interface.getStatus();
 %interface.joystickOn()

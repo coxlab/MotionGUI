@@ -70,7 +70,7 @@ classdef trajectory < handle
             self.nCoords=N;
             for iCoord=1:N
                 self.coords(iCoord).coord=new_batch(iCoord,1:3);
-                self.coords(iCoord).laser_power=new_batch(iCoord,4);
+                self.coords(iCoord).laser_power=new_batch(iCoord,4);                 
             end
             %cat(1,self.coords.coord)
             self.drawGrid()
@@ -170,6 +170,7 @@ classdef trajectory < handle
             else
                 disp('Creating 3D grid')
                 M=cat(1,T_zStack.coords.coord);
+                laser_power=cat(1,T_zStack.coords.laser_power);
                 FOV_size=[336 430]/1000;
                 overlap_factor=.80;
                 
@@ -178,8 +179,8 @@ classdef trajectory < handle
                 D=abs(diff(M));
                 nRows=ceil(D(2)/V);
                 nCols=ceil(D(1)/H);
-                X=linspace(M(1,1),M(2,1),nCols)
-                Y=linspace(M(1,2),M(2,2),nRows)
+                X=linspace(M(1,1),M(2,1),nCols);
+                Y=linspace(M(1,2),M(2,2),nRows);
                 [G_x,G_y]=meshgrid(X,Y);
                 G_x=G_x(:);
                 G_y=G_y(:);
@@ -189,8 +190,11 @@ classdef trajectory < handle
                 N=length(G_x(:));
                 repeater=repmat(1:N,2,1);
                 depth_selector=repmat([1 2],1,N)';
+                laser_values=laser_power(depth_selector);
                 
-                output=[G_x(repeater(:)) G_y(repeater(:)) depth_values(depth_selector(:)) G_x(repeater(:))*0];
+                %output=[G_x(repeater(:)) G_y(repeater(:)) depth_values(depth_selector(:)) G_x(repeater(:))*0];
+                output=[G_x(repeater(:)) G_y(repeater(:)) depth_values(depth_selector(:)) laser_values];
+                
                 self.batch_add(output);
             end
         end
