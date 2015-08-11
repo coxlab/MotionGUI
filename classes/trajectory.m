@@ -171,7 +171,8 @@ classdef trajectory < handle
                 disp('Creating 3D grid')
                 M=cat(1,T_zStack.coords.coord);
                 laser_power=cat(1,T_zStack.coords.laser_power);
-                FOV_size=[336 430]/1000;
+                %FOV_size=[336 430]/1000;
+                FOV_size=[640/512*400 640]/1000;
                 overlap_factor=.80;
                 
                 V=FOV_size(1)*overlap_factor;
