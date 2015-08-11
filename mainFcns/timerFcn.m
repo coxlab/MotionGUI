@@ -328,14 +328,14 @@ try
                                     interface.is_moving=1;
                                                                            
                                     if handles.ccd2p==2 % make sure toggle switch is engaged
-                                        upstroke=T.target_coord(3)==T.coords(1).coord(3);
+                                        upstroke=T.target_coord(3)==T.coords(1).coord(3);                                        
                                         if upstroke==0                                           
-                                            interface.track_speed=.003; % change this manually to get a good sampling of the stack
+                                            interface.track_speed=.05; % change this manually to get a good sampling of the stack
                                             interface.calc_velocities() % get velocities for each axis separately                                            
                                             fprintf('ETA: ~%3.2f seconds.\n',interface.track_time)
                                             interface.set_velocities(interface.track_velocities)
                                         else % given a 3D grid, we move back to the surface at max speed
-                                            interface.set_velocities(interface.max_velocities)
+                                            interface.set_velocities(interface.max_velocities/4)
                                         end
                                     else % in 2D grid, move fast all the time
                                         interface.set_velocities(interface.max_velocities)
