@@ -4,7 +4,7 @@ handles=guidata(varargin{1});
 
 
 axis_vector=[1 2 3];
-switch 3    % low velocties of joystick
+switch 1   % low velocties of joystick
     case 0 % default
         velocities_low=[.08 .08 .05];
     case 1 % typical
