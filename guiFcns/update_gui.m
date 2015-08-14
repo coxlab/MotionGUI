@@ -13,7 +13,7 @@ handles=guidata(H);
 interface=handles.interface;
 if interface.do_update==1    
     if interface.update_position==1        
-        plot_coords=interface.plot_coords;
+        plot_coords=interface.plot_coords.*[1e2 1e2 1];
         disp_coords=interface.disp_coords;
         
         set(handles.plot_handles(1).p(6).h,'Xdata',plot_coords(1),'Ydata',plot_coords(2))
@@ -103,10 +103,23 @@ end
 
 if handles.Calibration.window.calibrated==1
     % plot coverslip outer diameter
-    replotCircle(handles.plot_handles(1).p(3).h,handles.Calibration.window.center_coords,handles.Calibration.window.radius,100,'-');
+    handles.Calibration.window.center_coords=handles.Calibration.window.center_coords+[-.4 .5];
+    replotCircle(handles.plot_handles(1).p(3).h,handles.Calibration.window.center_coords*1e2,handles.Calibration.window.radius*1e2,100,'-');
 else
     % plot place holder
     replotCircle(handles.plot_handles(1).p(3).h,[-10 -10],0,100,'-');
+end
+
+if handles.Calibration.window.calibrated==1
+    cur_ax=get(handles.plot_handles(1).p(2).h,'parent');
+    window_size=4.3;
+    X_range=handles.Calibration.window.center_coords([1 1])*1e2+[-window_size window_size]/2*1e2;
+    Y_range=handles.Calibration.window.center_coords([2 2])*1e2+[-window_size window_size]/2*1e2;
+    set(cur_ax,'XLim',X_range,'YLim',Y_range)
+    %get(handles.plot_handles(1).p(1).h)
+    %YLim
+else
+    
 end
 
 guidata(H,handles);
