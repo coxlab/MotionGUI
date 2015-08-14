@@ -233,6 +233,14 @@ classdef serial_com < handle
             self.send(msg)
         end
         
+        function set_velocities_low(varargin)
+            self=varargin{1};
+            velocities=varargin{2};            
+            msg=sprintf('01JW%3.4f;02JW%3.4f;03JW%3.4f',velocities);
+            self.send(msg)
+        end
+        
+        
         %%% Set position
         function setTarget(varargin)
             self=varargin{1};
