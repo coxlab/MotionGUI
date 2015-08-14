@@ -6,13 +6,19 @@ handles.hAxis01=subplot(1,4,[1 3]);
 set(handles.hAxis01,'Parent',handles.hPanel_axis)
 
 % plot max outline
-switch 0
+switch 2
     case 1
         bg_im=double(imread('/Users/benvermaercke/Dropbox (coxlab)/2p-data/surgery_rig_images/AF17/IMG_6479.JPG'))/255;
         bg_im=fliplr(bg_im);
         
         surgery_im_scaling_factor=355.347;
         surgery_im_center=[1791 1392];
+    case 2
+        bg_im=double(imread('C:\Users\labuser\Documents\Repos\MotionGUI\Images\2015-08-10_AH03_im.png'))/256;
+        bg_im(:,:,2)=flipud(bg_im(:,:,2));
+                
+        surgery_im_scaling_factor=1;
+        surgery_im_center=[6.5 6.5];
         
     otherwise
         surgery_im_scaling_factor=1;
@@ -26,7 +32,7 @@ this_rect_scaled_centered=CenterRectOnPoint(this_rect_scaled,surgery_im_center(1
 cla
 hold on
 if exist('bg_im','var')
-    imshow(bg_im,[])
+    handles.plot_handles(1).p(1).im=imshow(bg_im,[]);
 end
 plot(surgery_im_center(1),surgery_im_center(2),'wo')
 circle(surgery_im_center,2*surgery_im_scaling_factor,100,'r-',2);
@@ -40,7 +46,7 @@ handles.plot_handles(1).p(1).default=this_rect_scaled_centered;
 handles.plot_handles(1).p(2).h=circle([-10 -10],0,100,'r-',1);
 
 % plot place holder window and crosshairs
-handles.plot_handles(1).p(3).h=circle([-10 -10],0,100,'b-',1);
+handles.plot_handles(1).p(3).h=circle([-10 -10],0,100,'r-',2);
 handles.plot_handles(1).p(4).h=plot([0 0],[-10 10],'k'); % AP
 handles.plot_handles(1).p(5).h=plot([-10 -10],[0 0],'k'); % ML
 
@@ -53,7 +59,7 @@ handles.plot_handles(1).p(6).h=h;
 
 hold off
 axis equal
-axis ([-1 14 -1 14])
+%axis ([-1 14 -1 14])
 xlabel('Medial <-> Lateral')
 ylabel('Posterior <-> Anterior')
 axis xy
