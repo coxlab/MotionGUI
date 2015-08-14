@@ -6,7 +6,7 @@ handles.hAxis01=subplot(1,4,[1 3]);
 set(handles.hAxis01,'Parent',handles.hPanel_axis)
 
 % plot max outline
-switch 2
+switch 0 
     case 1
         bg_im=double(imread('/Users/benvermaercke/Dropbox (coxlab)/2p-data/surgery_rig_images/AF17/IMG_6479.JPG'))/255;
         bg_im=fliplr(bg_im);
@@ -21,6 +21,8 @@ switch 2
         surgery_im_center=[6.5 6.5];
         
     otherwise
+        bg_im=double(imread('C:\Users\labuser\Documents\Repos\MotionGUI\Images\2015-08-10_AH03_im.png'))*0;
+        bg_im(:,:,2)=flipud(bg_im(:,:,2));        
         surgery_im_scaling_factor=1;
         surgery_im_center=[6.5 6.5];
 end
