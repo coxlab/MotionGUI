@@ -128,7 +128,7 @@ handles.hBut12b=uicontrol(hPanel_buttons,'Style','Pushbutton','String','C','Unit
 hBut13=uicontrol(hPanel_buttons,'Style','Pushbutton','String','Save','Units','Normalized','Position',[button_init+5*button_spacing_left button_init+2*button_spacing_up button_width/2 button_height],'Callback',{@config_file,'save'});
 hBut14=uicontrol(hPanel_buttons,'Style','Pushbutton','String','Load','Units','Normalized','Position',[button_init+5*button_spacing_left button_init+1*button_spacing_up button_width/2 button_height],'Callback',{@config_file,'load'});
 hBut15=uicontrol(hPanel_buttons,'Style','Pushbutton','String','Joystick','Units','Normalized','Position',[button_init+5*button_spacing_left button_init button_width/2 button_height],'Callback',@toggleJoystick);
-hBut16=uicontrol(hPanel_buttons,'Style','Pushbutton','String','Vel','Units','Normalized','Position',[button_init+5*button_spacing_left button_init-1*button_spacing_up button_width/2 button_height],'Callback',@changeVelocities);
+hBut16=uicontrol(hPanel_buttons,'Style','Pushbutton','String','Vel','Units','Normalized','Position',[button_init+5*button_spacing_left button_init-1*button_spacing_up button_width/2 button_height],'Callback',@setVelocity);
 
 %% add button to axis panel
 if ismac
