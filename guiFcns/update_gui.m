@@ -90,15 +90,15 @@ end
 
 if Calibration.window.show_AP==1&&handles.Calibration.window.calibrated==0
     AP=Calibration.window.coords([1 2],1:2);
-    set(handles.plot_handles(1).p(4).h,'Xdata',AP(:,1),'Ydata',AP(:,2))
+    set(handles.plot_handles(1).p(4).h,'Xdata',AP(:,1),'Ydata',AP(:,2),'color','r')
 else
-    set(handles.plot_handles(1).p(4).h,'Xdata',[0 0],'Ydata',[-10 -10])
+    set(handles.plot_handles(1).p(4).h,'Xdata',[0 0],'Ydata',[-10 -10],'color','r')
 end
 if Calibration.window.show_ML==1&&handles.Calibration.window.calibrated==0
     ML=Calibration.window.coords([3 4],1:2);
-    set(handles.plot_handles(1).p(5).h,'Xdata',ML(:,1),'Ydata',ML(:,2))
+    set(handles.plot_handles(1).p(5).h,'Xdata',ML(:,1),'Ydata',ML(:,2),'color','r')
 else
-    set(handles.plot_handles(1).p(5).h,'Xdata',[-10 -10],'Ydata',[0 0])
+    set(handles.plot_handles(1).p(5).h,'Xdata',[-10 -10],'Ydata',[0 0],'color','r')
 end
 
 if handles.Calibration.window.calibrated==1
