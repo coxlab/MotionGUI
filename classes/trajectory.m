@@ -206,11 +206,13 @@ classdef trajectory < handle
             self=varargin{1};
             handles=guidata(self.hFig);
             h=handles.plot_handles(1).p(7).h;
-            M=cat(1,self.coords.coord);
+            M=cat(1,self.coords.coord)*1e2;
             if self.nCoords==0
                 set(h,'xdata',[],'ydata',[])
             else
                 set(h,'xdata',M(:,1),'ydata',M(:,2))
+                set(h,'color',[1 0 0])
+                get(h,'color')
             end
         end
         
