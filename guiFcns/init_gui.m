@@ -21,8 +21,9 @@ switch 0
         surgery_im_center=[6.5 6.5];
         
     otherwise
-        bg_im=double(imread('C:\Users\labuser\Documents\Repos\MotionGUI\Images\2015-08-10_AH03_im.png'))*0;
-        bg_im(:,:,2)=flipud(bg_im(:,:,2));        
+        %bg_im=double(imread('C:\Users\labuser\Documents\Repos\MotionGUI\Images\2015-08-10_AH03_im.png'))*0;
+        %bg_im(:,:,2)=flipud(bg_im(:,:,2));        
+        bg_im=zeros(1300,1300);
         surgery_im_scaling_factor=1;
         surgery_im_center=[6.5 6.5];
 end
