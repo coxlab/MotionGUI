@@ -20,6 +20,13 @@ switch lower(mode)
         load(loadName,'Calibration')
         handles.Calibration=Calibration;
         
+        im_name='C:\Users\labuser\Documents\Repos\MotionGUI\Images\2015-08-14_AH05_im.png';
+        bg_im=double(imread(im_name));
+        bg_im(:,:,2)=flipud(bg_im(:,:,2));
+        bg_im=bg_im./max(bg_im(:));
+        set(handles.plot_handles(1).p(1).im,'Cdata',bg_im)
+        
+        
         interface.do_update=1;
         interface.update_position=1;
         handles.interface=interface;
