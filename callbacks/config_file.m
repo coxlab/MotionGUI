@@ -20,7 +20,16 @@ switch lower(mode)
         load(loadName,'Calibration')
         handles.Calibration=Calibration;
         
-        im_name='C:\Users\labuser\Documents\Repos\MotionGUI\Images\2015-08-14_AH05_im.png';
+        switch filename
+            case 'AH02_20150803.mat'
+                im_name='C:\Users\labuser\Documents\Repos\MotionGUI\Images\2015-08-10_AH02_resaved_im.png';
+            case 'AH03_20150807.mat'
+                im_name='C:\Users\labuser\Documents\Repos\MotionGUI\Images\2015-08-10_AH03_im.png';
+            case 'AH05_20150814.mat'
+                im_name='C:\Users\labuser\Documents\Repos\MotionGUI\Images\2015-08-14_AH05_im.png';
+            otherwise
+                im_name='C:\Users\labuser\Documents\Repos\MotionGUI\Images\2015-08-14_AH05_im.png';
+        end
         bg_im=double(imread(im_name));
         bg_im(:,:,2)=flipud(bg_im(:,:,2));
         bg_im=bg_im./max(bg_im(:));
