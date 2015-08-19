@@ -27,6 +27,8 @@ switch lower(mode)
                 im_name='C:\Users\labuser\Documents\Repos\MotionGUI\Images\2015-08-10_AH03_im.png';
             case 'AH05_20150814.mat'
                 im_name='C:\Users\labuser\Documents\Repos\MotionGUI\Images\2015-08-14_AH05_im.png';
+            case 'AH06_20150818.mat'                
+                im_name='C:\Users\labuser\Documents\Repos\MotionGUI\Images\2015-08-18_AH06_im.png';
             otherwise
                 im_name='C:\Users\labuser\Documents\Repos\MotionGUI\Images\2015-08-14_AH05_im.png';
         end
