@@ -103,7 +103,7 @@ end
 
 if handles.Calibration.window.calibrated==1
     % plot coverslip outer diameter
-    %handles.Calibration.window.center_coords=handles.Calibration.window.center_coords+[-.4 .5];
+    handles.Calibration.window.center_coords=handles.Calibration.window.center_coords+[-.4 .5];
     replotCircle(handles.plot_handles(1).p(3).h,handles.Calibration.window.center_coords*1e2,handles.Calibration.window.radius*1e2,100,'-');
 else
     % plot place holder
