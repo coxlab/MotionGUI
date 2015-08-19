@@ -58,9 +58,9 @@ try
     %supposed to be
     if ~isempty(state) && isfield(state,'init') && isfield(state.init,'PI') && isfield(state.init.PI,'hitting') % indicate position of objective is compromised
         if state.init.PI.hitting==1
-            set(handles.plot_handles(2).p(1),'faceColor','r')
+            %set(handles.plot_handles(2).p(1),'faceColor','r')
         else
-            set(handles.plot_handles(2).p(1),'faceColor','b')
+            %set(handles.plot_handles(2).p(1),'faceColor','b')
         end
     end
     
