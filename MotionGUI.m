@@ -44,7 +44,7 @@ clc
 
 %% create main fig
 hFig=figure(3);
-set(hFig,'Name','Create motion trajectories','NumberTitle','Off','MenuBar','None','Position',[824    50   444   436],'Resize','On');
+set(hFig,'Name','Create motion trajectories','NumberTitle','Off','MenuBar','None','Position',[706   556   564   426],'Resize','On');
 %WinOnTop(hFig,true);
 
 %%% Add subfolders
