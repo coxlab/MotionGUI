@@ -96,9 +96,11 @@ switch 3
             interface.go2target()
             
             %%% Go
+            state.init.allowUsePockels_duringGrab=1;
             T.run()
         else
             T.abort()
+            state.init.allowUsePockels_duringGrab=0;
         end
         
 end
