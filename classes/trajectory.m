@@ -172,7 +172,8 @@ classdef trajectory < handle
                 M=cat(1,T_zStack.coords.coord);
                 laser_power=cat(1,T_zStack.coords.laser_power);
                 %FOV_size=[336 430]/1000;
-                FOV_size=[640/512*400 640]/1000;
+                %FOV_size=[640/512*400 640]/1000;
+                FOV_size=[680/512*400 680]/1000;
                 overlap_factor=.80;
                 
                 V=FOV_size(1)*overlap_factor;
@@ -185,8 +186,14 @@ classdef trajectory < handle
                 [G_x,G_y]=meshgrid(X,Y);
                 G_x=G_x';
                 G_y=G_y';
+                
+                % 2DO: flip even rows to get snake configuration
+                %G_x(2:2:end)=fliplr(G_x(2:2:end));
+                
                 G_x=G_x(:);
                 G_y=G_y(:);
+                
+                
                 
                 depth_values=M(:,3);
                 depth_values=depth_values(:);
