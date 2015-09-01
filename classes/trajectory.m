@@ -184,17 +184,20 @@ classdef trajectory < handle
                 X=linspace(M(1,1),M(2,1),nCols);
                 Y=linspace(M(1,2),M(2,2),nRows);
                 [G_x,G_y]=meshgrid(X,Y);
-                G_x=G_x';
-                G_y=G_y';
                 
-                % 2DO: flip even rows to get snake configuration
-                %G_x(2:2:end)=fliplr(G_x(2:2:end));
+                % Flip even rows to get snake configuration
+                % if more time is needed then frames can be preallocated,
+                % go back to row-by-row by commenting the line below
+                G_x(2:2:end,:)=fliplr(G_x(2:2:end,:));
+                % using this option will save close to 15 seconds per line,
+                % and could be less stressful for the animal
+                
+                G_x=G_x';
+                G_y=G_y';                                                                
                 
                 G_x=G_x(:);
                 G_y=G_y(:);
-                
-                
-                
+                                                
                 depth_values=M(:,3);
                 depth_values=depth_values(:);
                 N=length(G_x(:));
