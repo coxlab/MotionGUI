@@ -45,5 +45,9 @@ switch mode
         handles.T_grid.clear();
         handles.stack_grid=1;
         handles.T_zStack.do_update=1;
+        if handles.ccd2p==1
+        else % 2p
+            state.init.allowUsePockels_duringGrab=0;
+        end
 end
 guidata(H,handles);

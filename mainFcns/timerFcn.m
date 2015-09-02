@@ -411,8 +411,7 @@ try
                         end
                         interface.set_velocities(interface.default_velocities)
                         pause(1)
-                        interface.joystickOn()
-                        state.init.allowUsePockels_duringGrab=0;
+                        interface.joystickOn()                        
                     end
             end
     end

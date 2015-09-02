@@ -95,12 +95,10 @@ switch 3
             interface.set_velocities(interface.max_velocities)
             interface.go2target()
             
-            %%% Go
-            state.init.allowUsePockels_duringGrab=1;
+            %%% Go            
             T.run()
         else
-            T.abort()
-            state.init.allowUsePockels_duringGrab=0;
+            T.abort()            
         end
         
 end
