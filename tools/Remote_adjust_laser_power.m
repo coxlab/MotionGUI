@@ -22,5 +22,6 @@ if state.init.eom.maxPower(beam)~=laser_power
     set(gh.powerControl.maxPowerText,'String',num2str(laser_power))
     updateGUIByGlobal('state.init.eom.maxPowerDisplaySlider');
     
+    %%% Send actual command to NIDAQ
     state.init.eom.(['hAOPark' num2str(beam)]).writeAnalogData(state.init.eom.lut(beam,laser_power),1,true); %VI122909A\B
 end
