@@ -111,9 +111,9 @@ else
     replotCircle(handles.plot_handles(1).p(3).h,[-10 -10],0,100,'-');
 end
 
-if handles.Calibration.window.calibrated==1
+if handles.Calibration.window.calibrated==1    
     cur_ax=get(handles.plot_handles(1).p(2).h,'parent');
-    window_size=4.3;
+    window_size=handles.Calibration.window.radius*2.5; % adjust to size of window, could vary if we go to 5 or 7 mm windows
     X_range=handles.Calibration.window.center_coords([1 1])*1e2+[-window_size window_size]/2*1e2;
     Y_range=handles.Calibration.window.center_coords([2 2])*1e2+[-window_size window_size]/2*1e2;
     set(cur_ax,'XLim',X_range,'YLim',Y_range)
