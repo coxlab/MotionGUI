@@ -29,10 +29,13 @@ switch lower(mode)
                 im_name='C:\Users\labuser\Documents\Repos\MotionGUI\Images\2015-08-14_AH05_im.png';
             case 'AH06_20150818.mat'                
                 im_name='C:\Users\labuser\Documents\Repos\MotionGUI\Images\2015-08-18_AH06_im.png';
+            case 'AJ01_20150901.mat'
+                im_name='C:\Users\labuser\Documents\Repos\MotionGUI\Images\2015-09-01_AJ01_im.png';
             otherwise
                 im_name='C:\Users\labuser\Documents\Repos\MotionGUI\Images\2015-08-14_AH05_im.png';
         end
         bg_im=double(imread(im_name));
+        bg_im(:,:,1)=flipud(bg_im(:,:,1));
         bg_im(:,:,2)=flipud(bg_im(:,:,2));
         bg_im=bg_im./max(bg_im(:));
         set(handles.plot_handles(1).p(1).im,'Cdata',bg_im)
