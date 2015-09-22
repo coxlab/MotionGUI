@@ -11,6 +11,9 @@ if Calibration.window.calibrated==1
     Calibration.window=Calibration.window_reset;
     Calibration.window.coords_collected=zeros(1,size(Calibration.window.coords,1));
     disp('Recalibrating')
+    interface.correctCoords(Calibration.window);
+    interface.do_update=1;
+    interface.update_position=1;
 else
     %disp('Starting new calibration')    
 end
@@ -63,10 +66,15 @@ if all(Calibration.window.coords_collected)
      % calculate angles of window, invert because our z-direction is
      % inverted
      Calibration.window.pitch=-calc_heading([coords(1,[2 3]) coords(2,[2 3])])/pi*180;
-     Calibration.window.roll=-calc_heading([coords(3,[1 3]) coords(4,[1 3])])/pi*180;     
+     Calibration.window.roll=-calc_heading([coords(3,[1 3]) coords(4,[1 3])])/pi*180;    
+     
+     interface.correctCoords(Calibration.window);
+     interface.do_update=1;
+     interface.update_position=1;
 end
 
 handles.Calibration=Calibration;
+handles.interface=interface;
 guidata(varargin{1},handles);
 
 update_gui(handles.hFig)

@@ -42,7 +42,7 @@ switch lower(mode)
         bg_im=bg_im./max(bg_im(:));
         set(handles.plot_handles(1).p(1).im,'Cdata',bg_im)
         
-        
+        interface.correctCoords(Calibration.window);
         interface.do_update=1;
         interface.update_position=1;
         handles.interface=interface;

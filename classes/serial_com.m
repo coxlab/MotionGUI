@@ -140,8 +140,12 @@ classdef serial_com < handle
         
         function correctCoords(varargin)
             self=varargin{1};
-            handles=guidata(self.H);
-            window=handles.Calibration.window;
+            if nargin>=2 % get window from input or from handles if not specified
+                window=varargin{2};
+            else
+                handles=guidata(self.H);
+                window=handles.Calibration.window;
+            end
             if window.calibrated==1                
                 self.plot_coords=self.cur_coords-[0 0 window.Z_offset];
                 self.disp_coords=self.cur_coords-[window.center_coords window.Z_offset];
