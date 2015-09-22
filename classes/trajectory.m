@@ -234,7 +234,7 @@ classdef trajectory < handle
             
             interface.iStep=0;
             interface.nStep=100;
-            interface.set_velocities(interface.max_velocities)            
+            interface.set_velocities(interface.max_velocities)      
             
             %%% Set properties
             self.running=1;
@@ -266,8 +266,9 @@ classdef trajectory < handle
             interface=handles.interface;
             
             if self.aborted==1
-                handles=guidata(self.hFig);
-                handles.interface.stop()
+               % handles=guidata(self.hFig);
+                interface.stop() % actually stop stages
+                pause(.1)
                 
                 disp('Aborted by user')
                 self.aborted=0;
@@ -275,11 +276,13 @@ classdef trajectory < handle
             
             interface.set_velocities(interface.default_velocities)
             interface.joystickOn()
-            
+            pause(.1)
+
             self.running=0;
             %disp('Not running')
             %self.moving=0;
             self.do_update=1;
+            
         end
         
         function out=run_checks(varargin)

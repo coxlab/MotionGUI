@@ -19,7 +19,7 @@ classdef serial_com < handle
         track_speed=[];
         cur_velocities=[]; % used for current/next move
         stages_moving=[];
-        is_moving=[]; % dummy variable to make code run, not used in real version of the code
+        moving=[]; % dummy variable to make code run, not used in real version of the code
         
         joystick=0;
         cur_coords=[];
@@ -187,7 +187,12 @@ classdef serial_com < handle
             for iAxis=1:3
                 msg=sprintf('%02dMD',iAxis);
                 self.send(msg)
-                moving(iAxis)=fscanf(self.s,'%f');
+                try
+                    res=fscanf(self.s,'%f');
+                    moving(iAxis)=res;
+                catch
+                    disp('Unable to read moving status bits...')
+                end
             end
             %%% MD stands for Motion Done, so 1 when stopped
             self.stages_moving=moving==0;
@@ -284,6 +289,10 @@ classdef serial_com < handle
             self=varargin{1};
             msg='ST';
             self.send(msg);
+            
+%             while self.motionDone()
+%                 disp('Waiting for stages to halt')
+%             end
         end
         
         function status=getStatus(varargin)

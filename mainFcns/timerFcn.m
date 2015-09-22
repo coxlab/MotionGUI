@@ -209,6 +209,8 @@ try
             %[T.is_running interface.motionDone() interface.getDist()>interface.tolerance interface.joystick]
             %[T.is_running interface.is_moving interface.getDist()>interface.tolerance interface.joystick]
                         
+            %[T.is_running() interface.getDist()]
+           
             if T.is_running==1
                 if interface.motionDone()==1
                     % we are not moving
@@ -220,14 +222,13 @@ try
                         if interface.joystick==1 % initiate
                             interface.joystickOff()
                             pause(.1)
-                            disp('Setting coordinates')
-                            interface.go2target()                            
-                            
-                            interface.is_moving=1;
                         end
+                        disp('Setting coordinates')
+                        interface.go2target()
+                        interface.moving=1;
                     else % clean up
                         % yes
-                        
+                        %disp('Already at target coord...')
                         T.finish()
                         %interface.is_moving=0;
                         %interface.set_velocities(interface.default_velocities)
@@ -261,6 +262,8 @@ try
                     
                     %interface.is_moving=0;
                     %T.is_running
+                      
+                    %[interface.getDist() interface.motionDone() T.is_running() T.is_moving()]
                     
                     if T.is_running==1                        
                         if interface.motionDone()==1                            
@@ -270,7 +273,7 @@ try
                             if interface.getDist()>interface.tolerance
                                 % no
                                 %interface.joystick   
-                                interface.is_moving=1;
+                                interface.moving=1;
                                 %interface.motionDone()
                             else % clean up
                                 % yes
@@ -426,6 +429,7 @@ end
 interface.getStatus();
 %interface.joystickOn()
 %interface.getErrorMsg()
+%rethrow(lasterror)
 
 update_gui(H)
 guidata(H,handles)

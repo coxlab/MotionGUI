@@ -128,16 +128,16 @@ switch 2
             % do nothing
         else
             T=handles.T_go2pos;
-            
-            
-            if T.running==0
+               
+            if T.is_running()==0
                 % parsing the coord string
                 str=strrep(str,'=',' '); % replace '='-signs by spaces to allow proper parsing
                 coords=sscanf(str,'%*s %f ; ')';
+                
                 T.target_coord=interface.rel2abs(coords);
                 %interface.target_coords=sscanf(str,'%*s %f ; ')';                
                 interface.setTarget(T.target_coord)
-                T.run();              
+                T.run(); 
             else
                 T.abort();
             end
