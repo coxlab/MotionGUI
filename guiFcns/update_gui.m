@@ -9,11 +9,13 @@ function update_gui(varargin)
 H=varargin{1};
 handles=guidata(H);
 
+scaling_factor=1e2;
+
 %%% Serial interface
 interface=handles.interface;
 if interface.do_update==1    
     if interface.update_position==1        
-        plot_coords=interface.plot_coords.*[1e2 1e2 1];
+        plot_coords=interface.plot_coords.*[scaling_factor scaling_factor 1];
         disp_coords=interface.disp_coords;
         
         set(handles.plot_handles(1).p(6).h,'Xdata',plot_coords(1),'Ydata',plot_coords(2))
@@ -90,13 +92,13 @@ end
 
 if Calibration.window.show_AP==1&&handles.Calibration.window.calibrated==0
     AP=Calibration.window.coords([1 2],1:2);
-    set(handles.plot_handles(1).p(4).h,'Xdata',AP(:,1),'Ydata',AP(:,2),'color','r')
+    set(handles.plot_handles(1).p(4).h,'Xdata',AP(:,1)*scaling_factor,'Ydata',AP(:,2)*scaling_factor,'color','r')
 else
     set(handles.plot_handles(1).p(4).h,'Xdata',[0 0],'Ydata',[-10 -10],'color','r')
 end
 if Calibration.window.show_ML==1&&handles.Calibration.window.calibrated==0
     ML=Calibration.window.coords([3 4],1:2);
-    set(handles.plot_handles(1).p(5).h,'Xdata',ML(:,1),'Ydata',ML(:,2),'color','r')
+    set(handles.plot_handles(1).p(5).h,'Xdata',ML(:,1)*scaling_factor,'Ydata',ML(:,2)*scaling_factor,'color','r')
 else
     set(handles.plot_handles(1).p(5).h,'Xdata',[-10 -10],'Ydata',[0 0],'color','r')
 end
@@ -105,7 +107,7 @@ if handles.Calibration.window.calibrated==1
     % plot coverslip outer diameter
     %handles.Calibration.window.center_coords=handles.Calibration.window.center_coords+[-.4 .5];
     %handles.Calibration.window.center_coords=handles.Calibration.window.center_coords+[.4 -.5];
-    replotCircle(handles.plot_handles(1).p(3).h,handles.Calibration.window.center_coords*1e2,handles.Calibration.window.radius*1e2,100,'-');
+    replotCircle(handles.plot_handles(1).p(3).h,handles.Calibration.window.center_coords*scaling_factor,handles.Calibration.window.radius*scaling_factor,100,'-');
 else
     % plot place holder
     replotCircle(handles.plot_handles(1).p(3).h,[-10 -10],0,100,'-');
@@ -114,8 +116,8 @@ end
 if handles.Calibration.window.calibrated==1    
     cur_ax=get(handles.plot_handles(1).p(2).h,'parent');
     window_size=handles.Calibration.window.radius*2.5; % adjust to size of window, could vary if we go to 5 or 7 mm windows
-    X_range=handles.Calibration.window.center_coords([1 1])*1e2+[-window_size window_size]/2*1e2;
-    Y_range=handles.Calibration.window.center_coords([2 2])*1e2+[-window_size window_size]/2*1e2;
+    X_range=handles.Calibration.window.center_coords([1 1])*scaling_factor+[-window_size window_size]/2*scaling_factor;
+    Y_range=handles.Calibration.window.center_coords([2 2])*scaling_factor+[-window_size window_size]/2*scaling_factor;
     set(cur_ax,'XLim',X_range,'YLim',Y_range)
     %get(handles.plot_handles(1).p(1).h)
     %YLim
