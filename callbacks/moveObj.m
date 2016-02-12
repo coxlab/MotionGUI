@@ -13,10 +13,11 @@ end
 
 function trackMarker(varargin)
 h=varargin{3};
+handles=guidata(h);
 temp=get(gca,'CurrentPoint');
 [x, y]=list(temp(1,1:2));
-x=restrictRange(x,[0 13]);
-y=restrictRange(y,[0 13]);
+x=restrictRange(x,handles.plot_handles(1).p(1).default([1 3]));
+y=restrictRange(y,handles.plot_handles(1).p(1).default([2 4]));
 set(h,'Xdata',x,'Ydata',y)
 end
 

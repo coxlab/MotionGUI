@@ -35,11 +35,10 @@ switch 3
         if handles.stack_grid==2
             handles.T_grid.clear()
         end
-        handles.T_zStack.append(new_coord)
+        handles.T_zStack.append(new_coord,state.init.eom.maxPower(2))
         coord_matrix=cat(1,handles.T_zStack.coords.coord);
         disp(coord_matrix)
         %set(handles.hEdit03,'String',sprintf('nCoords=%d',handles.T_zStack.nCoords))
 end
-
 
 guidata(H,handles)

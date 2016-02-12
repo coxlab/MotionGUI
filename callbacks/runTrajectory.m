@@ -5,8 +5,9 @@ global state
 
 H=varargin{1};
 handles=guidata(H);
+interface=handles.interface;
 
-switch 2
+switch 3
     case 1
         Trajectory=handles.Trajectory;
         
@@ -59,7 +60,7 @@ switch 2
                 T_stack=handles.T_grid;
         end
         interface=handles.interface;
-        if T_stack.running==0            
+        if T_stack.running==0
             interface.iStep=0;
             
             T_stack.running=1;
@@ -75,6 +76,31 @@ switch 2
         handles.T_grid=T_stack;
         handles.Trajectory=T_stack;
         handles.interface=interface;
+    case 3
+        if handles.stack_grid==1
+            T=handles.T_zStack;
+        else
+            T=handles.T_grid;
+        end
+        if T.running==0
+            %%% Make sure we start at the first coordinate in the list
+            T.target_index=1;
+            
+            %%% Turn off joystick
+            interface.joystickOff()
+            pause(.1)
+            
+            %%% Go to initial coordinate at full speed
+            interface.setTarget(T.coords(T.target_index).coord)
+            interface.set_velocities(interface.max_velocities)
+            interface.go2target()
+            
+            %%% Go            
+            T.run()
+        else
+            T.abort()            
+        end
+        
 end
 
 guidata(H,handles);
